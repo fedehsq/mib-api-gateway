@@ -3,7 +3,8 @@ from flask_login import (login_user, login_required, current_user)
 
 from mib.forms import UserForm
 from mib.rao.user_manager import UserManager
-from mib.auth.user import User
+from mib.auth.user import User, DEFAULT_PIC
+from base64 import b64encode
 
 users = Blueprint('users', __name__)
 
@@ -16,7 +17,11 @@ def user_registration(form):
         lastname = form.data['lastname']
         birthdate = form.data['birthdate']
         date = birthdate.strftime('%Y-%m-%d')
-        photo_path=form.data['photo']
+        print(form.data['photo'])
+        if form.data['photo']:
+            photo = 'data:image/jpeg;base64,' + b64encode(form.data['photo'].read()).decode('utf-8')
+        else:
+            photo = DEFAULT_PIC
 
         response = UserManager.create_user(
             email,
@@ -24,31 +29,34 @@ def user_registration(form):
             firstname,
             lastname,
             date,
-            photo_path
+            photo
         )
 
         if response.status_code == 201:
             # in this case the request is ok!
             
-            #user = response.json()
+            
             #to_login = User.build_from_json(user["user"])
             #login_user(to_login)            
             
             # after a successful registration, a message appears in the same page
             # inviting the just registered user to login
+            flash('Registered.')
             return render_template('register.html', 
-                mphoto = photo_path if not '' else 'profile_pics/profile_pic.svg', 
+                mphoto = photo,
                 form = form, 
                 just_registered = "You are registered! Please")
         elif response.status_code == 200:
             # user already exists
             return render_template('register.html', form = form, 
-                mphoto = 'profile_pics/profile_pic.svg',
+                mphoto = photo,
                 email_error_message = "Email already registered.")
                 
         else:
+            flash('Invalid email format.')
             return render_template('register.html', form = form,
-                mphoto = photo_path if not '' else 'profile_pics/profile_pic.svg', 
+                mphoto = photo,
+                email_error_message = "Invalid email."
             )
     # case in which the date format is incorrect
     else:
@@ -57,8 +65,9 @@ def user_registration(form):
             print(errorMessages)
         # wrong dath of birth inserted and
         # check if the user with this email is already registered
+        flash('Invalid date format.')
         return render_template('register.html', form = form, 
-            mphoto = 'profile_pics/profile_pic.svg', 
+            mphoto = DEFAULT_PIC, 
             date_error_message = "Date format DD/MM/YYYY.")
 
 @users.route('/users')
@@ -94,7 +103,7 @@ def create_user():
     else:
         # get the page
         suggest = "README: separate each forbidden word with a ',' "
-        return render_template('register.html', mphoto = 'profile_pics/profile_pic.svg', form = form, suggest = suggest)
+        return render_template('register.html', mphoto = DEFAULT_PIC, form = form, suggest = suggest)
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])

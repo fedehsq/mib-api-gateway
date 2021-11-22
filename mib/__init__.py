@@ -3,6 +3,8 @@ import os
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_environments import Environments
+from base64 import b64encode
+
 
 __version__ = '0.1'
 

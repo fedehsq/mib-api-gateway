@@ -3,7 +3,6 @@ from mib import app
 from flask_login import (logout_user)
 from flask import abort
 import requests
-from base64 import b64encode
 
 class UserManager:
     USERS_ENDPOINT = app.config['USERS_MS_URL']
@@ -75,10 +74,9 @@ class UserManager:
     def create_user(cls,
                     email: str, password: str,
                     firstname: str, lastname: str,
-                    birthdate, photo_path:str):
+                    birthdate, photo:str):
         try:
-            photo_bytes = b64encode(photo_path.read())
-            photo_string = photo_bytes.decode('utf-8') 
+            
             url = "%s/user" % cls.USERS_ENDPOINT
             response = requests.post(url,
                                      json={
@@ -87,14 +85,13 @@ class UserManager:
                                          'firstname': firstname,
                                          'lastname': lastname,
                                          'birthdate': birthdate,
-                                         'photo_path': photo_string
+                                         'photo': photo
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-        print(response.text)
         return response
 
     @classmethod
