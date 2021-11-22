@@ -72,8 +72,7 @@ class TestConfig(Config):
     """
     TESTING = True
 
-    import os
-    SECRET_KEY = os.urandom(24)
+    SECRET_KEY = 'a_very_useful_secret_key'
     WTF_CSRF_ENABLED = False
     LOGIN_DISABLED = True
 
@@ -86,5 +85,5 @@ class ProdConfig(Config):
     DEBUG = False
     WTF_CSRF_ENABLED = False
 
-    import os
-    SECRET_KEY = os.getenv('APP_SECRET_KEY', "paola")
+
+    SECRET_KEY = 'a_very_useful_secret_key'
