@@ -61,6 +61,20 @@ def user_registration(form):
             mphoto = 'profile_pics/profile_pic.svg', 
             date_error_message = "Date format DD/MM/YYYY.")
 
+@users.route('/users')
+def get_users():
+    if current_user.is_authenticated:
+        response = UserManager.get_all_users()
+        #users = db.session.query(User)
+        #searched_input=request.args.get("search")
+        print(type(response))
+    else:
+        return redirect("/login")
+    """ if searched_input:
+        users=search_users(searched_input)
+        return render_template("users.html", users = users, current_user = current_user, searched_input="You searched: "+searched_input)
+    else:"""
+    return render_template("users.html", users = response, current_user = current_user)
 
 @users.route('/register', methods=['GET', 'POST'])
 def create_user():

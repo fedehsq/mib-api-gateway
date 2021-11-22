@@ -87,4 +87,4 @@ class ProdConfig(Config):
     WTF_CSRF_ENABLED = False
 
     import os
-    SECRET_KEY = os.getenv('APP_SECRET_KEY', os.urandom(24))
+    SECRET_KEY = os.getenv('APP_SECRET_KEY', "paola")
