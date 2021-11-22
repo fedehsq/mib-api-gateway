@@ -1,0 +1,48 @@
+<html>
+  <html lang="en">
+  <head>
+    <link rel="stylesheet" href ="{{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }}">
+    <link rel="stylesheet" href = "{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200&display=swap" rel="stylesheet">
+  </head>
+    <body style="background-image: url({{ url_for('static', filename='svg/money.svg') }});
+    background-position: center;
+    ">
+      <div class="container" style="margin-top: 50px;">
+        <a href="/">
+          <img style="position: fixed; left: 5%;"
+          src="{{ url_for('static', filename='svg/icon_home.svg') }}" alt=""
+        >
+        </a>
+        <h1 style="font-family: Source Sans Pro, sans-serif;" id="page_title">Play Lottery</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                  <form action="" method="POST" class="box">
+                    <h1>Lottery</h1>
+                    {% if number != 0 %}
+                    <p id = "number" style="color:#FF0000";>ATTENTION: You have already choosen a number for this month, if you play again you will lose that!</p>
+                    {% endif %}
+                     {{ form.hidden_tag() }}
+                     {% for field in form.display %}
+                     {{ form[field].label }}
+                     <br>
+                     {{ form[field]() }}
+                       {% if form[field].errors %}
+                          {% for e in form[field].errors %}
+                           <p class="help-block">{{ e }}</p>
+                          {% endfor %}
+                       {% endif %}
+                     {% endfor %}
+                     <p id = "error_number" style="color:#FF0000";>{{ error_number }}</p>
+                     <input type=submit value="Play">
+                  </form>
+                </div>
+            </div>
+        </div>
+      </div>
+  </body>
+</html>
