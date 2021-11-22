@@ -44,7 +44,7 @@
             {% for user in users: %}
             {% if user != current_user and user.deleted == False %}
               <h5> 
-                <li> {{ user.firstname }} {{ user.lastname }}
+                <li> {{ user.email }}
                   <a href="/message/{{ user.email }}" class="btn" role="button" aria-pressed="true">
                     <i class="fa fa-send"></i> 
                   </a>

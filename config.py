@@ -85,4 +85,5 @@ class ProdConfig(Config):
     DEBUG = False
     WTF_CSRF_ENABLED = False
 
+
     SECRET_KEY = 'a_very_useful_secret_key'

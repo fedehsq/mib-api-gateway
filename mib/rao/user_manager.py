@@ -10,6 +10,23 @@ class UserManager:
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
 
     @classmethod
+    def get_all_users(cls):
+        """ This method contacts the user microservice and 
+        retrieves all the registered users except for the one
+        who is logged
+        """
+        try:
+            response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                users = [User.build_from_json(item) for item in json_payload.get('users_response')]
+                print("user response")
+                print(users)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        return users
+                
+    @classmethod
     def get_user_by_id(cls, user_id: int) -> User:
         """
         This method contacts the users microservice
@@ -21,8 +38,8 @@ class UserManager:
             response = requests.get("%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
+
             if response.status_code == 200:
-                # user is authenticated
                 user = User.build_from_json(json_payload)
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
