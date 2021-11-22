@@ -8,7 +8,6 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login(re=False):
-    print(current_user)
     # check if the user is already logged, 
     # if so the user will be redirected to his dashboard
     if current_user.is_authenticated:
