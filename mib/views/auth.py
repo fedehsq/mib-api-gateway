@@ -43,3 +43,12 @@ def logout():
     logout_user()
     return redirect('/')
 
+# Unsubscribe
+@auth.route("/delete")
+@login_required
+def delete():
+    id = current_user.id
+    response = UserManager.delete_user(id)
+    return render_template('delete.html')
+   
+   
