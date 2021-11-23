@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, url_for, flash, request
 from flask_login import login_required, current_user
-from mib.forms import UserForm
+from mib.forms.user import UserForm, ReportForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import DEFAULT_PIC
 from base64 import b64encode
@@ -10,6 +10,13 @@ users = Blueprint('users', __name__)
 
 # -------- ROUTES --------
 
+# Return filtered users
+# List all searched users by name, surname or email
+def search_users(searched_input):
+    response = UserManager.search_users(searched_input)
+    return response
+
+# List all users to choose a recipient for a message
 @users.route('/users')
 @login_required
 def get_users():
@@ -18,7 +25,37 @@ def get_users():
         All users registered to service.
     """
     response = UserManager.get_all_users()
-    return render_template("users.html", users = response, current_user = current_user)
+    searched_input = request.args.get("search")
+    if searched_input:
+        # filter and show the list
+        users = search_users(searched_input)
+        return render_template("users.html", users = users, 
+                               current_user = current_user, 
+                               searched_input = "You searched: " + searched_input)
+    else:
+        # get all users list
+        return render_template("users.html", users = response, 
+                               current_user = current_user)
+
+# Report a user
+@users.route("/users/report/<email>", methods = ['GET','POST'])
+@login_required
+def report(email):
+    form = ReportForm()
+    if request.method == 'GET':
+        form.email.data = email
+        # get the form to report a user
+        return render_template('report.html', form = form)
+    else:
+        if form.validate_on_submit():
+            email = form.data["email"]
+            reported_user = UserManager.report(email)
+            
+            # check if exists the user, if not redirect to report page again
+            if reported_user is None:
+                return render_template('report.html', form = form, email_error_message = 'No user with this email.')
+            else:
+                return redirect("/")
 
 @users.route('/register', methods=['GET', 'POST'])
 def create_user():
