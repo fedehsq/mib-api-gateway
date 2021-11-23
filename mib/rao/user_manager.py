@@ -1,7 +1,7 @@
 from mib.auth.user import User
 from mib import app
 from flask_login import (logout_user)
-from flask import abort
+from flask import abort, json
 import requests
 
 class UserManager:
@@ -19,8 +19,6 @@ class UserManager:
             json_payload = response.json()
             if response.status_code == 200:
                 users = [User.build_from_json(item) for item in json_payload.get('users_response')]
-                print("user response")
-                print(users)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         return users
@@ -37,7 +35,6 @@ class UserManager:
             response = requests.get("%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
-
             if response.status_code == 200:
                 user = User.build_from_json(json_payload)
             else:
@@ -45,8 +42,28 @@ class UserManager:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+        return user                
 
-        return user
+    @classmethod
+    def get_badwords_by_user_id(cls, user_id: int):
+        """
+        This method contacts the users microservice
+        and retrieves the user object by user id.
+        :param user_id: the user id
+        :return: User obj with id=user_id
+        """
+        try:
+            response = requests.get("%s/badwords/%s" % (cls.USERS_ENDPOINT, str(user_id)),
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                badwords = json_payload['badwords']
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        return badwords
 
     @classmethod
     def get_user_by_email(cls, user_email: str):
@@ -74,7 +91,8 @@ class UserManager:
     def create_user(cls,
                     email: str, password: str,
                     firstname: str, lastname: str,
-                    birthdate, photo:str):
+                    birthdate: str, photo:str,
+                    badwords: str):
         try:
             
             url = "%s/user" % cls.USERS_ENDPOINT
@@ -85,7 +103,8 @@ class UserManager:
                                          'firstname': firstname,
                                          'lastname': lastname,
                                          'birthdate': birthdate,
-                                         'photo': photo
+                                         'photo': photo,
+                                         'badwords': badwords
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
@@ -95,7 +114,10 @@ class UserManager:
         return response
 
     @classmethod
-    def update_user(cls, user_id: int, email: str, password: str):
+    def update_user(cls, user_id: int, password: str,
+                    firstname: str, lastname: str,
+                    birthdate, photo:str,
+                    badwords: str):
         """
         This method contacts the users microservice
         to allow the users to update their profiles
@@ -110,8 +132,12 @@ class UserManager:
             url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
             response = requests.put(url,
                                     json={
-                                        'email': email,
-                                        'password': password
+                                        'password': password,
+                                        'firstname': firstname,
+                                        'lastname': lastname,
+                                        'birthdate': birthdate,
+                                        'photo': photo,
+                                        'badwords': badwords
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
@@ -119,8 +145,6 @@ class UserManager:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-        raise RuntimeError('Error with searching for the user %s' % user_id)
 
     @classmethod
     def delete_user(cls, user_id: int):
@@ -141,7 +165,7 @@ class UserManager:
         return response
 
     @classmethod
-    def authenticate_user(cls, email: str, password: str) -> User:
+    def authenticate_user(cls, email: str, password: str):
         """
         This method authenticates the user trough users AP
         :param email: user email
@@ -163,10 +187,13 @@ class UserManager:
 
         if response.status_code == 401:
             # user is not authenticated
-            return None
+            return None, 401
+        elif response.status_code == 403:
+            # user is blocked
+            return None, 403
         elif response.status_code == 200:
             user = User.build_from_json(json_response['user'])
-            return user
+            return user, 200
         else:
             raise RuntimeError(
                 'Microservice users returned an invalid status code %s, and message %s'
