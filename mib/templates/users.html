@@ -42,7 +42,7 @@
             </form>
             <p id="results">{{searched_input}}</p>
             {% for user in users: %}
-            {% if user != current_user and user.deleted == False %}
+            {% if user != current_user %}
               <h5> 
                 <li> {{ user.email }}
                   <a href="/message/{{ user.email }}" class="btn" role="button" aria-pressed="true">

@@ -27,12 +27,15 @@ def get_users():
     response = UserManager.get_all_users()
     searched_input = request.args.get("search")
     if searched_input:
+        print('searched')
+        print(searched_input)
         # filter and show the list
         users = search_users(searched_input)
         return render_template("users.html", users = users, 
                                current_user = current_user, 
                                searched_input = "You searched: " + searched_input)
     else:
+        print('qua')
         # get all users list
         return render_template("users.html", users = response, 
                                current_user = current_user)
