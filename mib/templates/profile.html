@@ -39,7 +39,7 @@
             {{ form.hidden_tag() }}
 
             <img id="image" style="border-radius: 50%;"
-            src="{{ url_for('static', filename=mphoto) }}" width="200px" height="200px"/>
+            src="{{ mphoto }}" width="200px" height="200px"/>
 
             {% for field in form.display %}
               <dt>{{ form[field].label }}</dt>

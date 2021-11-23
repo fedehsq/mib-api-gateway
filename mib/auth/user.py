@@ -8,29 +8,38 @@ class User(UserMixin):
     to represents an authenticated user.
     """
     id = None
+    photo = None
     email = None
+    first_name = None
+    last_name = None
+    birthdate = None
     is_active = None
-    is_admin = None
     authenticated = None
-    extra_data = None
+    # extra_data = None
+
 
     @staticmethod
     def build_from_json(json: dict):
-        kw = {key: json[key] for key in ['id', 'email', 'is_active', 'authenticated', 'photo']}
+        kw = {key: json[key] for key in ['id', 'photo', 'email', 'first_name', 'last_name', 'birthdate', 'is_active', 'authenticated']}
+        """
         extra = json.copy()
         all(map(extra.pop, kw))
         kw['extra'] = extra
-
+        """
         return User(**kw)
 
     def __init__(self, **kw):
         if kw is None:
             raise RuntimeError('You can\'t build the user with none dict')
         self.id = kw["id"]
+        self.photo = kw["photo"]
         self.email = kw["email"]
+        self.first_name = kw["first_name"]
+        self.last_name = kw["last_name"]
+        self.birthdate = kw["birthdate"]
         self.is_active = kw["is_active"]
         self.authenticated = kw["authenticated"]
-        self.extra_data = kw['extra']
+        # self.extra_data = kw['extra']
 
     def get_id(self):
         return self.id
@@ -41,8 +50,8 @@ class User(UserMixin):
     def __getattr__(self, item):
         if item in self.__dict__:
             return self[item]
-        elif item in self.extra_data:
-            return self.extra_data[item]
+        # elif item in self.extra_data:
+        #    return self.extra_data[item]
         else:
             raise AttributeError('Attribute %s does not exist' % item)
 
