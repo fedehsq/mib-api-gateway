@@ -1,12 +1,44 @@
+from requests.api import request
+from werkzeug.exceptions import ServiceUnavailable
 from mib.auth.user import User
 from mib import app
 from flask_login import (logout_user)
-from flask import abort
+from flask import abort, json
 import requests
 
 class UserManager:
     USERS_ENDPOINT = app.config['USERS_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
+
+    @classmethod
+    # This method contacts the user microservice and 
+    # retrieves all the registered users that correspond 
+    # to the searched input
+    def search_users(cls, searched_input):
+        try: 
+            response = requests.post("%s/search_users/%s" % (cls.USERS_ENDPOINT, str(searched_input)), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                users = [User.build_from_json(item) for item in json_payload.get('searched_users')]
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        return users    
+
+    @classmethod
+    # This method contacts the user microservice to
+    # report a user, if it exists
+    def report(cls, email):
+        try:
+            response = requests.post("%s/report/%s" % (cls.USERS_ENDPOINT, str(email)), timeout= cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                reported_user = User.build_from_json(json_payload)
+            if response.status_code == 404:
+                reported_user = None
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        return reported_user    
+
 
     @classmethod
     def get_all_users(cls):
@@ -18,9 +50,9 @@ class UserManager:
             response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
             if response.status_code == 200:
-                users = [User.build_from_json(item) for item in json_payload.get('users_response')]
-                print("user response")
-                print(users)
+                # I get the dict of users and I retrieve each user from json
+                # and I save all Users in a list
+                users = [User.build_from_json(item) for item in json_payload.get('users_response')] 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         return users
