@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, url_for, flash, request
 from flask_login import login_required, current_user
 from mib.forms.user import UserForm, ReportForm
 from mib.rao.user_manager import UserManager
-from mib.auth.user import DEFAULT_PIC
+from mib.auth.user import DEFAULT_PIC, User
 from base64 import b64encode
 from datetime import datetime
 
@@ -27,8 +27,6 @@ def get_users():
     response = UserManager.get_all_users()
     searched_input = request.args.get("search")
     if searched_input:
-        print('searched')
-        print(searched_input)
         # filter and show the list
         users = search_users(searched_input)
         return render_template("users.html", users = users, 
@@ -130,7 +128,8 @@ def get_form_fields(form):
         'data:image/jpeg;base64,' + \
             b64encode(form.data['photo'].read()).decode('utf-8')
             if form.data['photo'] else DEFAULT_PIC,
-        form.data['badwords']
+        form.data['badwords'],
+        form.data['blacklist']
     )
 
 
@@ -140,12 +139,14 @@ def user_registration(form):
     """
     if form.validate_on_submit():
         email, password, firstname, lastname, \
-        birthdate, photo, badwords = get_form_fields(form)
+        birthdate, photo, badwords, _ = get_form_fields(form)
+       
         birthdate =  birthdate.strftime('%d/%m/%Y')
         response = UserManager.create_user(
             email, password, firstname,
             lastname, birthdate, photo, badwords
         )
+        print(response)
         if response.status_code == 201:
             # in this case the request is ok!
             # after a successful registration, a message appears in the same page
@@ -189,11 +190,11 @@ def edit_profile():
     if form.validate_on_submit():
         # update user info
         _, password, firstname, lastname, \
-        birthdate, photo, badwords = get_form_fields(form)
+        birthdate, photo, badwords, blacklist = get_form_fields(form)
         birthdate =  birthdate.strftime('%d/%m/%Y')
         response = UserManager.update_user(
             current_user.id, password, firstname,
-            lastname, birthdate, photo, badwords
+            lastname, birthdate, photo, badwords, blacklist
         )
 
         if response.status_code == 200: 
@@ -247,6 +248,13 @@ def fill_form_with_user(user):
         bws += bad + ', '
     bws = bws[:-2]
     form.badwords.data = bws
+
+    blacklist = UserManager.get_blacklist_by_user_id(user.id)
+    bl = ''
+    for black in blacklist:
+        bl += black.email + ', '
+    bl = bl[:-2]
+    form.blacklist.data = bl
     # form.blacklist.data = user.blacklist
     # password is omitted for security reason
     return form

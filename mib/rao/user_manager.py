@@ -100,6 +100,35 @@ class UserManager:
         return badwords
 
     @classmethod
+    def get_blacklist_by_user_id(cls, user_id: int):
+        """
+        This method contacts the users microservice
+        and retrieves the user object by user id.
+        :param user_id: the user id
+        :return: User obj with id=user_id
+        """
+        try:
+            response = requests.get("%s/blacklist/%s" % (cls.USERS_ENDPOINT, str(user_id)),
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            print(json_payload)
+            if response.status_code == 200:
+                # json_payolad is a couple: blacklisted person and response status
+                # if response status is 404, 
+                # the blacklisted user doesn't exist
+                # so it won't be in the final list
+                blacklist = [User.build_from_json(person) for person in json_payload.get('blacklist')]
+                # blacklist = [User.build_from_json(person[0]) for person in json_payload if person[1] != 404]
+                # blacklist = json_payload['blacklist']
+            else:
+                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        return blacklist
+
+
+    @classmethod
     def get_user_by_email(cls, user_email: str):
         """
         This method contacts the users microservice
@@ -151,7 +180,7 @@ class UserManager:
     def update_user(cls, user_id: int, password: str,
                     firstname: str, lastname: str,
                     birthdate, photo:str,
-                    badwords: str):
+                    badwords: str, blacklist: str):
         """
         This method contacts the users microservice
         to allow the users to update their profiles
@@ -171,7 +200,9 @@ class UserManager:
                                         'lastname': lastname,
                                         'birthdate': birthdate,
                                         'photo': photo,
-                                        'badwords': badwords
+                                        'badwords': badwords,
+                                        'blacklist' : blacklist
+                    
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )

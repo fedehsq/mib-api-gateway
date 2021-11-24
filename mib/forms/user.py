@@ -19,9 +19,9 @@ class UserForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
     birthdate = f.DateField('Birthday', format='%d/%m/%Y')
     badwords = f.StringField('Badwords', widget = TextArea())
-    #blacklist = f.StringField('Blacklist', widget = TextArea())
+    blacklist = f.StringField('Blacklist', widget = TextArea(), default="")
     display = ['photo', 'email', 'firstname', 'lastname', 
-                'password', 'birthdate', 'badwords']
+                'password', 'birthdate', 'badwords', 'blacklist']
 
 # Form created to report a user
 class ReportForm(FlaskForm):
