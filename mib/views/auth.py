@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template
+from requests.api import request
 from flask_login import login_required, login_user, logout_user, current_user
 from mib.forms import LoginForm
 from mib.rao.user_manager import UserManager
@@ -41,15 +42,18 @@ def logout():
     """
     This method allows the users to log out of the system
     Returns:
-        Redirects the view to the home page
+        Redirects the view to the login page
     """
     logout_user()
-    return redirect('/')
+    return redirect('/login')
 
-# Unsubscribe
 @auth.route("/delete")
 @login_required
 def delete():
-    id = current_user.id
-    response = UserManager.delete_user(id)
+    """
+    This method allows the user to delete himself from the system
+    Returns:
+        The delete page template
+    """
+    UserManager.delete_user(current_user.id)
     return render_template('delete.html')

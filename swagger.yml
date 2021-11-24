@@ -10,19 +10,22 @@ paths:
   /:
     get:
       tags: [ Home ]
-      summary: Return the home page of the web app
+      summary: Return the home page of the logged user
       responses:
         200:
-          description: Renders the index.html template
+          description: Renders the index.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
 
   /login:
-    tags: [ Authentication ]
     get:
+      tags: [ Authentication ]
       summary: Shows the login page and its form
       responses:
         200:
-          description: Renders the login.html template
+          description: Renders the login.html template if the user is not logged, otherwise it renders index.html.
     post:
+      tags: [ Authentication ]
       summary: Handles the login of the user
       requestBody:
         required: true
@@ -40,92 +43,24 @@ paths:
                 - password
       responses:
         200:
-          description: Reloads the login.html page with a warning, in case the user credentials were invalid
+          description: Reloads the login.html page with a warning, in case the user credentials were invalid.
         302:
-          description: Redirects to the correct profile page, depending on the type of the user
+          description: Redirects to the correct profile page if the user is logged.
 
   
-  /user/{id}:
+  /profile:
     get:
       tags: [ Profile ]
-      summary: Shows the profile page of the customer specified by the id
-      parameters:
-      - name: id
-        in: path
-        description: Customer's unique identifier
-        required: true
-        schema:
-          type: integer
+      summary: Shows the profile page of the logged customer
       responses:
         200:
-          description: Renders the customer_profile template, filled with the ssn form and the user's reservations
-        302:
-          description: Redirects to the homepage, in case the user accessing the profile is not its owner
+          description: Renders the profile template if the user is logged filled with the user's infos. Otherwise he is redirect to login page
+        302: 
+          description: Redirects to the login page if user isn't logged
     
-    put:
-      summary: Updates the fields for the customer depending on its id
-      tags:
-        - Users
-      parameters:
-        - name: id
-          description: User Unique ID
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: the email field for the user
-                password:
-                  type: string
-                  description: the password field for the user
-              required:
-                - email
-                - password
-      responses:
-        200:
-          description: Renders the update_customer template, to allow the customer to modify its data
-        302:
-          description: Redirects to the customer profile page
-  /logout:
-    get:
-      tags: [ Authentication ]
-      summary: Logs out the logged user
-      responses:
-        302:
-          description: Redirects to the homepage
-  /register:
-    get:
-      tags: [ User ]
-      summary: This method allows to retrieve the sign up page for a new user
-      parameters:
-        - name: type_
-          description: type of the user
-          in: path
-          required: true
-          schema: 
-            type: string
-      responses:
-        200:
-          description: Renders the create_user template, filled with the fiels for the user's data
     post:
-      summary: Add a new customer
-      tags: [ User ]
-      parameters:
-        - name: type_
-          description: type of the user
-          in: path
-          required: true
-          schema: 
-            type: string
+      summary: Updates the fields for the logged customer by using his id
+      tags:  [ Profile ]
       requestBody:
         required: true
         content:
@@ -139,9 +74,6 @@ paths:
                 password:
                   type: string
                   description: the password field for the user
-                social_number:
-                  type: string
-                  description: the social number field for the user
                 firstname: 
                   type: string
                   description: the firstname field for the user
@@ -151,25 +83,131 @@ paths:
                 birthdate:
                   type: string
                   description: the birthday field for the user
+                badwords:
+                  type: string
+                  description: the badwords field for the user
+                blacklist:
+                  type: string
+                  description: the blacklist field for the user
+              required:
+                - password
+                - firstname
+                - lastname
+                - birthday
+      responses:
+        200:
+          description: Renders the update_customer template, to allow the customer to modify its data
+        302: 
+          description: Redirects to the login page if user isn't logged
+
+          
+  /logout:
+    get:
+      tags: [ Authentication ]
+      summary: Logs out the logged user
+      responses:
+        302:
+          description: Redirects to the login page if the user is logged
+        200: 
+          description: Render login.html template if the user isn't logged
+          
+  /register:
+    get:
+      tags: [ User ]
+      summary: This method allows to retrieve the sign up page for a new user
+      responses:
+        200:
+          description: Renders the register template filled with the fields for the user's data
+        302: 
+          description: Redirects to the user home page if user is logged
+    post:
+      summary: Add a new customer
+      tags: [ User ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: the email field for the user
+                password:
+                  type: string
+                  description: the password field for the user
+                firstname: 
+                  type: string
+                  description: the firstname field for the user
+                lastname: 
+                  type: string
+                  description: the lastname field for the user
+                birthdate:
+                  type: string
+                  description: the birthday field for the user
+                badwords:
+                  type: string
+                  description: the badwords field for the user
               required:
                 - email
                 - password
+                - firstname
+                - lastname
+                - birthday
       responses:
-        302:
-          description: Redirects to the correct profile page, depending on the type of the user
+        200:
+          description: Reloads the register.html page with a warning, in case the user credentials were invalid. Otherwise it informs user of correct registration.
+
   
-  /user/{user_id}:
-    delete:
-        tags: [ User ]
-        description: Delete a user by its id
-        parameters:
-          - name: user_id
-            description: User Unique ID
-            in: path
-            required: true
-            schema:
-              type: integer
-              format: int64
-        responses:
-          302:
-            description: User deleted, it redirects to the index page
+  /delete:
+    get:
+      summary: Deletes the logged user
+      tags: [ User ]
+      responses:
+        200:
+          description: User deleted using his id, then it renders delete.html template
+        302: 
+          description: Redirects to the login page if user isn't logged
+          
+  /users:
+    get: 
+      summary: List all registered user to the logged user
+      tags: [ Users ]
+      responses:
+        200:
+          description: Renders users.html template that shows all registered users to the service
+        302: 
+          description: Redirects to the login page if user isn't logged
+          
+                    
+  /users/report/{email}:
+    get: 
+      summary: Report a user
+      tags: [ Users ]
+      parameters:
+      - name: email
+        in: path
+        description: Customer's unique email
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Renders report.html template that shows the form to report the user indetified by its email
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      summary: Report a user
+      tags: [ Users ]
+      parameters:
+      - name: email
+        in: path
+        description: Customer's unique email
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Renders report.html template that informs the logged user of inserting an invalid email
+        302: 
+          description: Report the user, and redirects to the home page if the user is logged othwerwise redirects to the login page
