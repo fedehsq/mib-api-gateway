@@ -17,7 +17,7 @@ def search_users(searched_input):
     return response
 
 # List all users to choose a recipient for a message
-@users.route('/users')
+@users.route('/users', methods = ['GET'])
 @login_required
 def get_users():
     """
@@ -33,7 +33,6 @@ def get_users():
                                current_user = current_user, 
                                searched_input = "You searched: " + searched_input)
     else:
-        print('qua')
         # get all users list
         return render_template("users.html", users = response, 
                                current_user = current_user)
@@ -52,7 +51,7 @@ def report(email):
             email = form.data["email"]
             reported_user = UserManager.report(email)
             
-            # check if exists the user, if not redirect to report page again
+            # check if the user exists, if not redirect to report page again
             if reported_user is None:
                 return render_template('report.html', form = form, email_error_message = 'No user with this email.')
             else:
@@ -78,25 +77,6 @@ def create_user():
         suggest = "README: separate each forbidden word with a ',' "
         return render_template('register.html', mphoto = DEFAULT_PIC, form = form, suggest = suggest)
 
-
-@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
-@login_required
-def delete_user(id):
-    """Deletes the data of the user from the database.
-
-    Args:
-        id_ (int): takes the unique id as a parameter
-
-    Returns:
-        Redirects the view to the home page
-    """
-
-    response = UserManager.delete_user(id)
-    if response.status_code != 202:
-        flash("Error while deleting the user")
-        return redirect(url_for('auth.profile', id=id))
-        
-    return redirect(url_for('home.index'))
 
 @users.route('/profile', methods=['POST', 'GET'])
 @login_required
