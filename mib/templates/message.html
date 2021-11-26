@@ -89,9 +89,6 @@
 
   <script>
     function setStyle() {
-      if ("{{ message|safe }}" == "None") {
-        return
-      }
       if ("{{ message.bold }}" == "True") {
         try {
           document.getElementById("bold").checked = true; 

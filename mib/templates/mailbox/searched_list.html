@@ -23,12 +23,12 @@
                 <dd style="font-weight: bold;"><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
                 <dd style="font-weight: bold;"><span style="font-weight: bold;">From:</span> {{ message.sender }}</dd>
                 <dd style="font-weight: bold;"><span style="font-weight: bold; ">Message:</span> {{ message.body }}<dd>              
-                <dd style="font-weight: bold;"><span style="font-weight: bold;">Date: </span>{{ message.time }}</dd>
+                <dd style="font-weight: bold;"><span style="font-weight: bold;">Date: </span>{{ message.timestamp }}</dd>
                 {% else %}
                 <dd><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
-                <dd><span style="font-weight: bold;">To:</span> {{ message.dest }}</dd>
+                <dd><span style="font-weight: bold;">To:</span> {{ message.receiver }}</dd>
                 <dd><span style="font-weight: bold; ">Message:</span> {{ message.body }}</dd>              
-                <dd><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
                 {% endif %}
                 <div class="btn-group">
                     <input type="button" onclick='window.location.href="/mailbox/inbox/{{ message.id }}"'
@@ -46,15 +46,15 @@
                 {% for message in sent %}
                 {% if message.id in read_msg %}
                 <dd style = "color: forestgreen;"><span style="font-weight: bold; ">Id:</span> {{ message.id }}</dd>
-                <dd style = "color: forestgreen;"><span style="font-weight: bold; ">To:</span> {{ message.dest }}</dd>
+                <dd style = "color: forestgreen;"><span style="font-weight: bold; ">To:</span> {{ message.receiver }}</dd>
                 <dd style = "color: forestgreen;"><span style="font-weight: bold;">Message:</span> {{ message.body }}</dd>              
-                <dd style = "color: forestgreen;"><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd style = "color: forestgreen;"><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
                 {% else %}
                 <!-- message attribute -->
                 <dd><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
-                <dd><span style="font-weight: bold;">To:</span> {{ message.dest }}</dd>
+                <dd><span style="font-weight: bold;">To:</span> {{ message.receiver }}</dd>
                 <dd><span style="font-weight: bold; ">Message:</span> {{ message.body }}</dd>              
-                <dd><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
                 <div class="btn-group">
                     <input type="button" onclick='window.location.href="/mailbox/sent/{{ message.id }}"'
                     value="Read" class="btn btn-primary"></input>
@@ -69,9 +69,9 @@
                 {% for message in scheduled %}
                 <!-- message attribute -->
                 <dd><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
-                <dd><span style="font-weight: bold;">To:</span> {{ message.dest }}</dd>
+                <dd><span style="font-weight: bold;">To:</span> {{ message.receiver }}</dd>
                 <dd><span style="font-weight: bold; ">Message:</span> {{ message.body }}</dd>              
-                <dd><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
                 <div class="btn-group">
                     <input type="button" onclick='window.location.href="/mailbox/scheduled/{{ message.id }}"'
                     value="Read" class="btn btn-primary"></input>

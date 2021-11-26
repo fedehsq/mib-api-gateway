@@ -20,11 +20,7 @@
       {% if page_title == 'Scheduled' %}
           <div style="margin: auto;">
             <p style="color: black; font-size: 30;">Your points: {{ points }}</p>
-            {% if (points < 150) %}
-            <p style="color: red;">Remember! You need 150 points to delete a scheduled message! <a href="/playLottery">Play lottery</a> to win points!</p>
-            {% else %}
-            <p style="color: black; font-size: 15;">To delete a message you have to pay 150 points!</p>
-            {% endif %}
+           
           </div>
       {% endif %}
       <div class="col-md-6">
@@ -35,23 +31,23 @@
                 {% if message.read == False and page_title == 'Inbox' %}
                 <dd style="font-weight: bold;"><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
                 <dd style="font-weight: bold;"><span style="font-weight: bold;">From:</span> {{ message.sender }}</dd>
-                <dd style="font-weight: bold;"><span style="font-weight: bold;">To:</span> {{ message.dest }}</dd>
+                <dd style="font-weight: bold;"><span style="font-weight: bold;">To:</span> {{ message.receiver }}</dd>
                 <dd style="font-weight: bold;"><span style="font-weight: bold; ">Message:</span> {{ message.body }}<dd>              
-                <dd style="font-weight: bold;"><span style="font-weight: bold;">Date: </span>{{ message.time }}</dd>
+                <dd style="font-weight: bold;"><span style="font-weight: bold;">Date: </span>{{ message.timestamp }}</dd>
                
                 {% elif message.id in read_msg and page_title == 'Sent' %}
                 <dd style = "font-weight: bold;"><span style="font-weight: bold; ">Id:</span> {{ message.id }}</dd>
                 <dd style = "font-weight: bold;"><span style="font-weight: bold; ">From:</span> {{ message.sender }}</dd>
-                <dd style = "font-weight: bold;"><span style="font-weight: bold; ">To:</span> {{ message.dest }}</dd>
+                <dd style = "font-weight: bold;"><span style="font-weight: bold; ">To:</span> {{ message.receiver }}</dd>
                 <dd style = "font-weight: bold;"><span style="font-weight: bold;">Message:</span> {{ message.body }}</dd>              
-                <dd style = "font-weight: bold;"><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd style = "font-weight: bold;"><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
 
                 {% else %}
                 <dd><span style="font-weight: bold;">Id:</span> {{ message.id }}</dd>
                 <dd><span style="font-weight: bold;">From:</span> {{ message.sender }}</dd>
-                <dd><span style="font-weight: bold;">To:</span> {{ message.dest }}</dd>
+                <dd><span style="font-weight: bold;">To:</span> {{ message.receiver }}</dd>
                 <dd><span style="font-weight: bold; ">Message:</span> {{ message.body }}</dd>              
-                <dd><span style="font-weight: bold; ">Date: </span>{{ message.time }}</dd>
+                <dd><span style="font-weight: bold; ">Date: </span>{{ message.timestamp }}</dd>
                 {% endif %}
 
                     {% if page_title == 'Draft' %}
@@ -92,7 +88,7 @@
                     value="Read" class="btn btn-primary"
                     >  
                     </input>
-                      {% if points > 149 %}
+                      {% if points  %}
                         <button name="delete" tag="delete" id ="delete" value="{{ message.id }}" class="btn btn-primary" type="submit">Delete</button>
                       {% endif %}
                     {% else %}

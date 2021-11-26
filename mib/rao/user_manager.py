@@ -43,8 +43,7 @@ class UserManager:
     @classmethod
     def get_all_users(cls):
         """ This method contacts the user microservice and 
-        retrieves all the registered users except for the one
-        who is logged
+        retrieves all the registered users
         """
         try:
             response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -61,7 +60,7 @@ class UserManager:
     def get_user_by_id(cls, user_id: int) -> User:
         """
         This method contacts the users microservice
-        and retrieves the user object by user id.
+        and retri.eves the user object by user id.
         :param user_id: the user id
         :return: User obj with id=user_id
         """
@@ -73,7 +72,6 @@ class UserManager:
                 user = User.build_from_json(json_payload)
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
-
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         return user                
@@ -111,7 +109,6 @@ class UserManager:
             response = requests.get("%s/blacklist/%s" % (cls.USERS_ENDPOINT, str(user_id)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
-            print(json_payload)
             if response.status_code == 200:
                 # json_payolad is a couple: blacklisted person and response status
                 # if response status is 404, 
@@ -126,7 +123,6 @@ class UserManager:
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         return blacklist
-
 
     @classmethod
     def get_user_by_email(cls, user_email: str):
@@ -157,21 +153,19 @@ class UserManager:
                     birthdate: str, photo:str,
                     badwords: str):
         try:
-            
             url = "%s/user" % cls.USERS_ENDPOINT
             response = requests.post(url,
-                                     json={
-                                         'email': email,
-                                         'password': password,
-                                         'firstname': firstname,
-                                         'lastname': lastname,
-                                         'birthdate': birthdate,
-                                         'photo': photo,
-                                         'badwords': badwords
-                                     },
-                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
-                                     )
-
+                                    json = {
+                                        'email': email,
+                                        'password': password,
+                                        'firstname': firstname,
+                                        'lastname': lastname,
+                                        'birthdate': birthdate,
+                                        'photo': photo,
+                                        'badwords': badwords
+                                    },
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                                    )
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
         return response
@@ -223,10 +217,8 @@ class UserManager:
             logout_user()
             url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
             response = requests.delete(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
         return response
 
     @classmethod
