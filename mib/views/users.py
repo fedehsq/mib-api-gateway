@@ -49,11 +49,12 @@ def report(email):
     else:
         if form.validate_on_submit():
             email = form.data["email"]
-            reported_user = UserManager.report(email)
-            
+            code = UserManager.report(email)
             # check if the user exists, if not redirect to report page again
-            if reported_user is None:
-                return render_template('report.html', form = form, email_error_message = 'No user with this email.')
+            if code == 404:
+                return render_template('report.html', 
+                    form = form, 
+                    email_error_message = 'No user with this email.')
             else:
                 return redirect("/")
 
@@ -124,13 +125,14 @@ def user_registration(form):
         birthdate =  birthdate.strftime('%d/%m/%Y')
         response = UserManager.create_user(
             email, password, firstname,
-            lastname, birthdate, photo, badwords
+            lastname, birthdate, photo
         )
-        print(response)
         if response.status_code == 201:
+            user_id = response.json()['body']['id']
             # in this case the request is ok!
             # after a successful registration, a message appears in the same page
             # inviting the just registered user to login
+            UserManager.create_badwords(user_id, badwords.split(', '))
             return render_template('register.html', 
                 mphoto = photo,
                 form = form, 
@@ -172,23 +174,25 @@ def edit_profile():
         _, password, firstname, lastname, \
         birthdate, photo, badwords, blacklist = get_form_fields(form)
         birthdate =  birthdate.strftime('%d/%m/%Y')
-        response = UserManager.update_user(
-            current_user.id, password, firstname,
-            lastname, birthdate, photo, badwords, blacklist
+        updated_user = UserManager.update_user(
+            current_user.email, current_user.id, password, firstname,
+            lastname, birthdate, photo
         )
+        updated_badwords = UserManager.update_badwords(current_user.id, badwords.split(', '))
+        updated_blacklist = UserManager.update_blacklist(current_user.id, blacklist.split(', '))
 
-        if response.status_code == 200: 
-            # update current user
-            current_user.photo = photo
-            current_user.first_name = firstname
-            current_user.last_name = lastname
-            current_user.birthdate = birthdate
-            # user = UserManager.get_user_by_id(current_user.id)
-            # display a message advising correct info update
-            return render_template("profile.html", 
-                mphoto = current_user.photo,
-                form = fill_form_with_user(current_user), 
-                just_edited = "Personal info updated. Return to ")
+        #if response.status_code == 200: 
+        # update current user
+        current_user.photo = updated_user.photo
+        current_user.first_name = updated_user.first_name
+        current_user.last_name = updated_user.last_name
+        current_user.birthdate = updated_user.birthdate
+        # user = UserManager.get_user_by_id(current_user.id)
+        # display a message advising correct info update
+        return render_template("profile.html", 
+            mphoto = current_user.photo,
+            form = fill_form_with_user(current_user, updated_badwords, updated_blacklist), 
+            just_edited = "Personal info updated. Return to ")
     # wrong date format
     else:
         return render_template("profile.html", 
@@ -199,7 +203,9 @@ def show_profile():
     """
     Open a page with user infos
     """
-    form = fill_form_with_user(current_user)
+    badwords = UserManager.get_badwords_by_user_id(current_user.id)
+    blacklist = UserManager.get_blacklist_by_user_id(current_user.id)
+    form = fill_form_with_user(current_user, badwords, blacklist)
     suggest = "README: separate each forbidden word and each blacklisted user with a ','"
     return render_template("profile.html", 
         mphoto = current_user.photo, 
@@ -207,7 +213,7 @@ def show_profile():
         suggest = suggest)
 
 
-def fill_form_with_user(user):
+def fill_form_with_user(user, badwords, blacklist):
     """
     Programatically fill the UserForm with a User
     """
@@ -222,17 +228,17 @@ def fill_form_with_user(user):
     except: 
         form.birthdate.data = datetime.strptime(user.birthdate, "%d/%m/%Y")
     # form.points.data = user.points
-    badwords = UserManager.get_badwords_by_user_id(user.id)
+    #badwords = UserManager.get_badwords_by_user_id(user.id)
     bws = ''
     for bad in badwords:
         bws += bad + ', '
     bws = bws[:-2]
     form.badwords.data = bws
 
-    blacklist = UserManager.get_blacklist_by_user_id(user.id)
+    #blacklist = UserManager.get_blacklist_by_user_id(user.id)
     bl = ''
     for black in blacklist:
-        bl += black.email + ', '
+        bl += black + ', '
     bl = bl[:-2]
     form.blacklist.data = bl
     # form.blacklist.data = user.blacklist

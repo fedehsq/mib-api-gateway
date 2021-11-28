@@ -3,9 +3,11 @@ DEFAULT_PIC = 'data:image/svg+xml;base64,' + 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 
 class User(UserMixin):
     """
-    This class represents an authenticated user.
+    This class represents an authenticated user or a general user of 
+    the service.
     It is not a model, it is only a lightweight class used
-    to represents an authenticated user.
+    to represents an authenticated user or a general user of 
+    the service.
     """
     id = None
     photo = None
@@ -13,14 +15,18 @@ class User(UserMixin):
     first_name = None
     last_name = None
     birthdate = None
-    is_active = None
+    #is_active = None
     authenticated = None
     # extra_data = None
 
 
+    # A list of fields to be serialized
+    SERIALIZE_LIST = ['id', 'email', 'first_name', 'last_name', 'birthdate', 'photo']
+
     @staticmethod
     def build_from_json(json: dict):
-        kw = {key: json[key] for key in ['id', 'photo', 'email', 'first_name', 'last_name', 'birthdate', 'is_active', 'authenticated']}
+        #kw = {key: json[key] for key in ['id', 'photo', 'email', 'first_name', 'last_name', 'birthdate', 'is_active', 'authenticated']}
+        kw = {key: json[key] for key in User.SERIALIZE_LIST}
         """
         extra = json.copy()
         all(map(extra.pop, kw))
@@ -37,8 +43,8 @@ class User(UserMixin):
         self.first_name = kw["first_name"]
         self.last_name = kw["last_name"]
         self.birthdate = kw["birthdate"]
-        self.is_active = kw["is_active"]
-        self.authenticated = kw["authenticated"]
+        #self.is_active = kw["is_active"]
+        #self.authenticated = False
         # self.extra_data = kw['extra']
 
     def get_id(self):
