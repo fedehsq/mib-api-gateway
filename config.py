@@ -34,7 +34,7 @@ class Config(object):
 
     # lottery microservice
     LOTTERY_MS_PROTO = os.getenv('LOTTERY_MS_PROTO', 'http')
-    LOTTERY_MS_HOST = os.getenv('LOTTERY_MS_HOST', 'localhost')
+    LOTTERY_MS_HOST = os.getenv('LOTTERY_MS_HOST', 'lottery_ms_worker')
     LOTTERY_MS_PORT = os.getenv('LOTTERY_MS_PORT', 5003)
     LOTTERY_MS_URL = '%s://%s:%s' % (LOTTERY_MS_PROTO, LOTTERY_MS_HOST, LOTTERY_MS_PORT)
 
