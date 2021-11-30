@@ -55,8 +55,11 @@ def draft(id):
         messages = draft)
     # ... or if a fixed message is selected by id
     message = MessageManager.get_message_by_id(id)
-    # launch template to edit if m is already in draft
-    return edit_message(message.receiver, message) if message else redirect('/mailbox')
+    if message.sender == current_user.email:
+        # launch template to edit if m is already in draft
+        return edit_message(message.receiver, message) if message else redirect('/mailbox')
+    else:
+        return redirect('/mailbox')
 
 
 @mailbox.route('/mailbox/sent/', defaults={'id': ''}, methods = ['GET', 'POST'])
@@ -129,7 +132,7 @@ def inbox(id):
             messages = inbox) 
     # ... or if a fixed message is selected by id
     message = MessageManager.get_message_by_id(id)
-    if not message:
+    if not message or message.receiver != current_user.email:
         return redirect('/mailbox')
     # set the flag read to True, because the user is reading the message
     message.read = True
@@ -183,7 +186,7 @@ def render_message_by_id(id):
     Renders template for the message with id = id
     """
     message = MessageManager.get_message_by_id(id)
-    if not message:
+    if not message or message.sender != current_user.email:
         return redirect('/mailbox')
     # launch template to read the sent message
     form = fill_message_form_from_message(message)

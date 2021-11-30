@@ -232,7 +232,7 @@ def check_blacklist(recipients_list):
         user = UserManager.get_user_by_email(email)
         blacklist = UserManager.get_blacklist_by_user_id(user.id)
         # if the sender is in the recipient "item" blacklist, return the recipient
-        if current_user in blacklist:
+        if current_user.email in blacklist:
             if blacklisted_by == "":
                 blacklisted_by = blacklisted_by + email
             else:
