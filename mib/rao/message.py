@@ -7,7 +7,9 @@ class Message():
 
     # All fields of message
     id = None
+    sender_id = None
     sender = None
+    receiver_id = -1
     receiver = None
     body = None
     photo = None
@@ -20,15 +22,13 @@ class Message():
     italic = None
     underline = None
 
-    SERIALIZE_LIST = ['id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
+    SERIALIZE_LIST = ['id', 'sender_id', 'receiver_id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
              'draft', 'scheduled', 'sent', 'read', 'bold', 'italic',\
              'underline']
 
     @staticmethod
     def build_from_json(json: dict):
-        kw = {key: json[key] for key in ['id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
-             'draft', 'scheduled', 'sent', 'read', 'bold', 'italic',\
-             'underline']}
+        kw = {key: json[key] for key in Message.SERIALIZE_LIST}
         return Message(**kw)
 
     def serialize(self):
@@ -38,6 +38,8 @@ class Message():
         if kw == {}:
             return
         self.id = kw["id"]
+        self.sender_id = kw["sender_id"]
+        self.receiver_id = kw["receiver_id"]
         self.sender = kw["sender"]
         self.receiver = kw["receiver"]
         self.body = kw["body"]

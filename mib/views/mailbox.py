@@ -14,20 +14,21 @@ def show_mailbox():
     """
     Renders a template showing the mailbox of the user
     """
-
     # fields filled if user is searching
     msg_field = request.args.get('msg')
     msg_user = request.args.get('user')
     msg_date = request.args.get('date')
     # get the number of new messages to display the notifications
-    notifications = MessageManager.get_notifications_number(current_user.email)
+    notifications = MessageManager.get_notifications_number(current_user.email, current_user.id)
     inbox = notifications['inbox']
     sent = notifications['sent']
+    print(sent)
     # no search request
     if not msg_field and not msg_user and not msg_date:
         return render_template("mailbox.html", inbox = inbox, sent = sent)
     # search request
     res_received, res_sent, res_to_be_sent = MessageManager.get_filtered_messages(
+        current_user.id,
         current_user.email, msg_field, msg_user, msg_date)
     return render_template("mailbox/searched_list.html", 
         page_title = 'Search', 
@@ -49,7 +50,7 @@ def draft(id):
 
     # check if the request is to see all messages...
     if (id == ''):
-        draft = MessageManager.get_draft(current_user.email)
+        draft = MessageManager.get_draft(current_user.email, current_user.id)
         return render_template("mailbox/messages_list_.html", 
         page_title = 'Draft', 
         messages = draft)
@@ -74,15 +75,15 @@ def sent(id):
     # check if the request is to see all messages...
     if (id == ''):
         # get the sent messages
-        sent = MessageManager.get_sent(current_user.email)
+        sent = MessageManager.get_sent(current_user.email, current_user.id)
         # get the read message by the receiver to display the notifications
         read_by_receiver = []
         for message in sent:
-            if message.read == 1 and message.sent == 1:
+            if message.read != 0 and message.sent == 1:
                 # to avoid display again the notification
                 message.sent = 2
-                read_by_receiver.append(message)
                 MessageManager.update_message(message)
+                read_by_receiver.append(message)
         return render_template("mailbox/messages_list_.html", 
             page_title = 'Sent', 
             messages = sent,
@@ -105,7 +106,7 @@ def scheduled(id):
         #current_user.points -= 150
     # check if the request is to see all messages...
     if (id == ''):
-        scheduled = MessageManager.get_scheduled(current_user.email)
+        scheduled = MessageManager.get_scheduled(current_user.email, current_user.id)
         return render_template("mailbox/messages_list_.html", 
             page_title = 'Scheduled', 
             messages = scheduled) 
@@ -126,7 +127,7 @@ def inbox(id):
     # check if the request is to see all messages...
     if (id == ''):
         # contacts the messages ms
-        inbox = MessageManager.get_inbox(current_user.email)
+        inbox = MessageManager.get_inbox(current_user.email, current_user.id)
         return render_template("mailbox/messages_list_.html", 
             page_title = 'Inbox', 
             messages = inbox) 
@@ -147,31 +148,6 @@ def inbox(id):
         form = form)
 
 # ------- AUXILIARY FUNCTIONS -------
-"""def search_messages(body, sender, date):
-    Given the body (and/or) the sender (and/or) the date, 
-    returns the filtered messages
-    if not body and not sender and not date:
-        return 0, 0, 0
-    if date:
-        try:
-            msg_date = datetime.strptime(date, '%Y-%m-%d').strftime('%d/%m/%Y')
-        except:
-            return "error"
-
-    scheduled = MessageManager.get_scheduled(current_user.email)
-    inbox = MessageManager.get_inbox(current_user.email)
-    sent = MessageManager.get_sent(current_user.email)
-    return filter_list(inbox, body, sender, msg_date),\
-           filter_list(sent, body, sender, msg_date),\
-           filter_list(scheduled, body, sender, msg_date)
-
-def filter_list(messages, body, sender, date):
-    Returns a filtered list 
-    for m in messages:
-        if body in m.body and sender in m.sender and date in m.timestamp:
-            messages.append(m)"""
-
-
 def check_delete_message():
     """
     Check if user wants to delete a message, 
@@ -195,13 +171,3 @@ def render_message_by_id(id):
         disabled = True,
         mphoto = 'data:image/jpeg;base64,' + message.photo if message.photo != '' else None,
         form = form)
-"""
-def render(message):
-    # launch template to read the sent message
-    form = fill_message_form_from_message(message)
-    form.receiver.label = 'From'
-    return render_template("message.html", 
-        mphoto = 'data:image/jpeg;base64,' + message.photo if message.photo != '' else None,
-        message = message,
-        disabled = True, 
-        form = form)"""

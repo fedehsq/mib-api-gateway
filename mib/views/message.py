@@ -150,11 +150,6 @@ def validate_message(message):
     not_registered = check_dests(recipients_list)
     if not_registered != "":
         return (USER_INEXISTENT, not_registered)
-    """# check if the recipients are deleted (but still registered because they
-    # don't have empty scheduled queue)
-    deleted = check_deleted(recipients_list)
-    if deleted != "":
-        return (USER_INEXISTENT, deleted)"""
     # check if the sender is in one of the recipient's blacklist 
     blacklist = check_blacklist(recipients_list)
     if blacklist != "":
@@ -172,12 +167,12 @@ def validate_message(message):
             updated_list.append(email)
     return result_send(updated_list, len_lis, message, removed_dst)
 
-
 def check_words(message, rec):
     """
     Check message body to avoid badwords for a particular receiver
     """
     receiver = UserManager.get_user_by_email(rec)
+    message.receiver_id = receiver.id
     badwords = UserManager.get_badwords_by_user_id(receiver.id)
     if badwords == []:
         return False
@@ -313,6 +308,9 @@ def build_message(form, msg):
     # fake id
     message.id = msg.id if msg else -1
     message.sender = current_user.email
+    message.sender_id = current_user.id
+    # fake id
+    #message.receiver_id = -1
     message.receiver = form.receiver.data
     message.body = form.body.data
     message.timestamp = str_date
@@ -323,17 +321,6 @@ def build_message(form, msg):
     message.italic = True if request.form.get('italic') else False
     message.underline = True if request.form.get('underline') else False
     return message
-
-
-# Return the message with id 'id' 
-def get_message_by_id(messages, id):
-    m = None
-    for message in messages:
-        if (message.id == id):
-            # avoid pytest missing
-            m = message
-    return m
-
 
 # Programatically fill a message form
 def fill_message_form_from_message(message):
