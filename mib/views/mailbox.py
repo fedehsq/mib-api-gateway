@@ -78,7 +78,7 @@ def sent(id):
         # get the read message by the receiver to display the notifications
         read_by_receiver = []
         for message in sent:
-            if message.read == True and message.sent == 1:
+            if message.read == 1 and message.sent == 1:
                 # to avoid display again the notification
                 message.sent = 2
                 read_by_receiver.append(message)
@@ -134,8 +134,8 @@ def inbox(id):
     message = MessageManager.get_message_by_id(id)
     if not message or message.receiver != current_user.email:
         return redirect('/mailbox')
-    # set the flag read to True, because the user is reading the message
-    message.read = True
+    # set the flag read to 1, because the user is reading the message
+    message.read = 1
     MessageManager.update_message(message)
     # launch template to read the sent message
     form = fill_message_form_from_message(message)
