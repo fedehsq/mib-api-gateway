@@ -164,7 +164,6 @@ def validate_message(message):
     removed_dst = ''
     for email in recipients_list:
         if check_words(message, email):
-            print(email)
             if removed_dst == '':
                 removed_dst = email
             else:
@@ -186,7 +185,6 @@ def check_words(message, rec):
     cleaned_body = re.split('\W', message.body)
     for word in badwords:
         if word in cleaned_body:
-            print("c'è una parola")
             return True
     return False
 
@@ -275,23 +273,6 @@ def draft_new_message(message):
 def update_draft_message(message):
     # get the draft messages of current user
     MessageManager.update_message(message)
-"""    messages = Messages().to_messages(draft)
-    # find the message with same id and swap it
-    for msg in messages.messages:
-        if msg.id == old.id:
-            msg.dest = new.dest
-            msg.body = new.body
-            msg.time = new.time
-            msg.photo = new.photo
-            msg.bold = new.bold
-            msg.italic = new.italic
-            msg.underline = new.underline
-            # msg.id = new.id
-            # avoid pythest missing
-            # break
-    current_user.draft = messages.to_string()
-    db.session.commit()"""
-
 
 # Remove the draft from draft when it has been sent
 def draft_remove(message: Message):
@@ -328,7 +309,6 @@ def build_message(form, msg):
         image_string = byte_image.decode('utf-8')
     # build the message to draft or to send
 
-    #print(request.form.to_dict())
     message = Message()
     # fake id
     message.id = msg.id if msg else -1
@@ -339,8 +319,6 @@ def build_message(form, msg):
     message.photo = image_string
     message.draft = True if request.form.get('choice') == 'Draft' else False
     message.scheduled = not message.draft
-    #message.sent = 0
-    #message.read = False
     message.bold = True if request.form.get('bold') else False
     message.italic = True if request.form.get('italic') else False
     message.underline = True if request.form.get('underline') else False

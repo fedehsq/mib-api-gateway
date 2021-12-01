@@ -15,22 +15,20 @@ class Message():
     draft = None
     scheduled = None
     sent = 0
-    read = False
+    read = 0
     bold = None
     italic = None
     underline = None
-    hidden_for_sender = False
-    hidden_for_receiver = True
 
     SERIALIZE_LIST = ['id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
              'draft', 'scheduled', 'sent', 'read', 'bold', 'italic',\
-             'underline', 'hidden_for_sender', 'hidden_for_receiver']
+             'underline']
 
     @staticmethod
     def build_from_json(json: dict):
         kw = {key: json[key] for key in ['id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
              'draft', 'scheduled', 'sent', 'read', 'bold', 'italic',\
-             'underline', 'hidden_for_sender', 'hidden_for_receiver']}
+             'underline']}
         return Message(**kw)
 
     def serialize(self):
@@ -52,8 +50,6 @@ class Message():
         self.bold = kw["bold"]
         self.italic = kw["italic"]
         self.underline = kw["underline"]
-        self.hidden_for_sender = kw["hidden_for_sender"]
-        self.hidden_for_receiver = kw["hidden_for_receiver"]
 
     def get_id(self):
         return self.id

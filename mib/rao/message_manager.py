@@ -32,7 +32,6 @@ class MessageManager:
                 filtered_inbox = [Message.build_from_json(message) for message in json_payload['body']['filtered_inbox']]
                 filtered_sent = [Message.build_from_json(message) for message in json_payload['body']['filtered_sent']]
                 filtered_scheduled = [Message.build_from_json(message) for message in json_payload['body']['filtered_scheduled']]
-                print(filtered_scheduled)
             else:
                 raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
