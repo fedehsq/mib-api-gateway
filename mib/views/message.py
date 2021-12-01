@@ -164,6 +164,7 @@ def validate_message(message):
     removed_dst = ''
     for email in recipients_list:
         if check_words(message, email):
+            print(email)
             if removed_dst == '':
                 removed_dst = email
             else:
@@ -185,6 +186,7 @@ def check_words(message, rec):
     cleaned_body = re.split('\W', message.body)
     for word in badwords:
         if word in cleaned_body:
+            print("c'è una parola")
             return True
     return False
 
