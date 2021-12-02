@@ -373,6 +373,8 @@ class UserManager:
         elif response.status_code == 200:
             user = User.build_from_json(json_response['body'])
             return user, 200
+        elif response.status_code == 400:
+            return None, 400
         else:
             raise RuntimeError(
                 'Microservice users returned an invalid status code %s, and message %s'

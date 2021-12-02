@@ -11,7 +11,8 @@ home = Blueprint('home', __name__)
 def index():
     # calculate the number of notifications 
     # number of message received to read + number of message sent that have been read       
-    notifications = MessageManager.get_notifications_number(current_user.email)
+    notifications = MessageManager.get_notifications_number(
+        current_user.email, current_user.id)
     inbox = notifications['inbox']
     sent = notifications['sent']
     # get the list of messages that has to be read

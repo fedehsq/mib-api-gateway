@@ -29,6 +29,10 @@ def login():
             # valid user
             login_user(user)
             return redirect('/')
+        elif code == 404:
+            # Not exists 
+            return render_template('login.html', form = form, 
+                wrong_credentials = "Email not registered.")
         else:
             # deleted or wrong credentials
             return render_template('login.html', form = form, 

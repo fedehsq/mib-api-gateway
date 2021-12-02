@@ -1,7 +1,7 @@
 <html>
   <html lang="en">
       <head>
-
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href ="{{ url_for('static', filename='css/bootstrap/bootstrap.min.css') }}">
         <link rel="stylesheet" href = "{{ url_for('static', filename='css/styles.css') }}">
@@ -10,6 +10,19 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200&display=swap" rel="stylesheet">
       </head>
+
+      <script>
+        $(function() {
+          $('#getFeatures').click(function() {
+            var features = [];
+            $('.feature input[type="checkbox"]:checked').each(function() {
+              features.push($(this).val());
+            });
+            $('#selectedFeatures').html(features.join(', '));
+          });
+        });
+      </script>
+     
   <body style="
   margin-right: 30px;
     background-image: url({{ url_for('static', filename='svg/friends.svg') }});
@@ -24,48 +37,43 @@
       >
       </a>
       <h1>Users List</h1>
-          <ul>
-            <br>
-            <form method="get" action="/users">
-              <input style="border: 0;
-              background: rgb(0 0 0 / 50%);
-              margin: 5px auto;
-              text-align: center;
-              border: 2px solid #3498db;
-              padding: 10px 10px;
-              width: 200px;
-              outline: none;
-              color: white;
-              border-radius: 24px;
-              transition: 0.25s" name="search" tag="search" id ="search" placeholder="Search here"></input>
-              <button class="btn btn-primary" type="submit">Search</button>
-            </form>
-            <p id="results">{{searched_input}}</p>
-            {% for user in users: %}
-            {% if user != current_user %}
-              <h5> 
-                <li> {{ user.email }}
-                  <a href="/message/{{ user.email }}" class="btn" role="button" aria-pressed="true">
-                    <i class="fa fa-send"></i> 
-                  </a>
-                  <a href="/users/report/{{ user.email }}" style="color: red;" class="btn" role="button" aria-pressed="true">
-                    <i class="fa fa-ban"></i> 
-                  </a>
-                </li>
-              </h5>
-            {% endif %}
-            {% endfor %}
-          </ul>
+        <ul>
+          <br>
+          <form method="get" action="/users">
+            <input style="border: 0;
+            background: rgb(0 0 0 / 50%);
+            margin: 5px auto;
+            text-align: center;
+            border: 2px solid #3498db;
+            padding: 10px 10px;
+            width: 200px;
+            outline: none;
+            color: white;
+            border-radius: 24px;
+            transition: 0.25s" name="search" tag="search" id ="search" placeholder="Search here"></input>
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
+            <form action="/message/" method="post"> 
+              <p id="results">{{searched_input}}</p>
+              {% for user in users: %}
+                {% if user != current_user %}
+                  <h5> 
+                    <li> {{ user.email }} {{ user.firstname }} {{ user.lastname }}
+                      <a href="/message/{{ user.email }}" class="btn" role="button" aria-pressed="true">
+                        <i class="fa fa-send"></i> 
+                      </a>
+                      <a href="/users/report/{{ user.email }}" style="color: red;" class="btn" role="button" aria-pressed="true">
+                        <i class="fa fa-ban"></i> 
+                      </a>
+                      <input type = "checkbox" name="feature[]" value = "{{ user.email }}"  >
+                    </li>
+                  </h5>
+                {% endif %}
+              {% endfor %}
+            <button id="getFeatures" class="btn btn-primary" style = "position: absolute; bottom: 10%; right: 40%;">Group</button>
+          </form>
+        </ul>
     </div>
-    <form action="/message" method="get">
-      <button 
-        class="btn btn-primary"
-        style="position: absolute;
-        bottom: 10%;
-        right: 40%;"
-      >
-      Group</button>
-   </form>
-    
+  <form >
   </body>
 </html>
