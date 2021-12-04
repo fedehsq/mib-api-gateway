@@ -15,23 +15,15 @@ class User(UserMixin):
     first_name = None
     last_name = None
     birthdate = None
-    #is_active = None
     authenticated = None
-    # extra_data = None
-
+    points = None
 
     # A list of fields to be serialized
-    SERIALIZE_LIST = ['id', 'email', 'first_name', 'last_name', 'birthdate', 'photo']
+    SERIALIZE_LIST = ['id', 'email', 'first_name', 'last_name', 'birthdate', 'photo', 'points']
 
     @staticmethod
     def build_from_json(json: dict):
-        #kw = {key: json[key] for key in ['id', 'photo', 'email', 'first_name', 'last_name', 'birthdate', 'is_active', 'authenticated']}
         kw = {key: json[key] for key in User.SERIALIZE_LIST}
-        """
-        extra = json.copy()
-        all(map(extra.pop, kw))
-        kw['extra'] = extra
-        """
         return User(**kw)
 
     def __init__(self, **kw):
@@ -43,9 +35,7 @@ class User(UserMixin):
         self.first_name = kw["first_name"]
         self.last_name = kw["last_name"]
         self.birthdate = kw["birthdate"]
-        #self.is_active = kw["is_active"]
-        #self.authenticated = False
-        # self.extra_data = kw['extra']
+        self.points = kw["points"]
 
     def get_id(self):
         return self.id
@@ -56,8 +46,6 @@ class User(UserMixin):
     def __getattr__(self, item):
         if item in self.__dict__:
             return self[item]
-        # elif item in self.extra_data:
-        #    return self.extra_data[item]
         else:
             raise AttributeError('Attribute %s does not exist' % item)
 

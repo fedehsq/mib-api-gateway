@@ -109,8 +109,8 @@ def scheduled(id):
         scheduled = MessageManager.get_scheduled(current_user.email, current_user.id)
         return render_template("mailbox/messages_list_.html", 
             page_title = 'Scheduled', 
-            messages = scheduled) 
-            #points = current_user.points) 
+            messages = scheduled,
+            points = current_user.points) 
     # ... or if a fixed message is selected by id
     return render_message_by_id(id) 
 

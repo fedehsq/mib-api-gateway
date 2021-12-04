@@ -47,7 +47,6 @@ paths:
         302:
           description: Redirects to the correct profile page if the user is logged.
 
-  
   /profile:
     get:
       tags: [ Profile ]

@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask_wtf.form import FlaskForm
 from flask_login import login_required, current_user
 from mib.forms.user import UserForm, ReportForm
 from mib.rao.user_manager import UserManager
@@ -114,7 +115,7 @@ def get_form_fields(form):
     )
 
 
-def user_registration(form):
+def user_registration(form: UserForm):
     """
     Register a user if all fields are properly filled
     """
@@ -149,14 +150,12 @@ def user_registration(form):
             )
     # case in which the date format is incorrect
     else:
-        """for fieldName, errorMessages in form.errors.items():
-            print(fieldName)
-            print(errorMessages)"""
-        # wrong dath of birth inserted and
-        # check if the user with this email is already registered
-        return render_template('register.html', form = form, 
-            mphoto = DEFAULT_PIC, 
-            date_error_message = "Date format DD/MM/YYYY.")
+        for field, error in form.errors.items():
+            # wrong dath of birth inserted and
+            # check if the user with this email is already registered
+            return render_template('register.html', form = form, 
+                mphoto = DEFAULT_PIC, 
+                date_error_message = field + ': ' + error[0])
 
 
 
@@ -168,7 +167,7 @@ def edit_profile():
     # the email is not editable 
     # so manual fill this field to avoid error on submit
     form.email.data = current_user.email
-    # points = current_user.points
+    #points = current_user.points
     if form.validate_on_submit():
         # update user info
         _, password, firstname, lastname, \
@@ -221,26 +220,13 @@ def fill_form_with_user(user, badwords, blacklist):
     form.email.data = user.email
     form.firstname.data = user.first_name
     form.lastname.data = user.last_name
+    form.points.data = user.points
     try:
         date = datetime.strptime(user.birthdate, "%Y-%m-%dT%H:%M:%SZ")
         date = date.strftime('%d/%m/%Y')
         form.birthdate.data = datetime.strptime(date, "%d/%m/%Y")
     except: 
         form.birthdate.data = datetime.strptime(user.birthdate, "%d/%m/%Y")
-    # form.points.data = user.points
-    #badwords = UserManager.get_badwords_by_user_id(user.id)
-    bws = ''
-    for bad in badwords:
-        bws += bad + ', '
-    bws = bws[:-2]
-    form.badwords.data = bws
-
-    #blacklist = UserManager.get_blacklist_by_user_id(user.id)
-    bl = ''
-    for black in blacklist:
-        bl += black + ', '
-    bl = bl[:-2]
-    form.blacklist.data = bl
-    # form.blacklist.data = user.blacklist
-    # password is omitted for security reason
+    form.badwords.data = ', '.join(badwords)
+    form.blacklist.data = ', '.join(blacklist)
     return form

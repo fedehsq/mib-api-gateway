@@ -55,7 +55,7 @@ class AgeValidator(Exception):
                 else:
                     valid = True
         else:
-            self.message = "Invalid date"
+            self.message = "Date format dd/mm/YYYY"
             valid = False
 
         if not valid:

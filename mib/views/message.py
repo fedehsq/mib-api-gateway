@@ -127,14 +127,14 @@ def edit_message(receiver, msg = None):
                     disabled = True,
                     form = form, 
                     draft = DRAFT)
-        # invalid date
+        # invalid fields
         else:
-            # photo = 'data:image/jpeg;base64,' + msg.photo if msg and msg.photo != '' else None,
-            return render_template('message.html',
-                mphoto = photo if msg else None,
-                message = message,
-                form = form, 
-                date_error_message = DATE_ERROR)
+            for field, error in form.errors.items():
+                return render_template('message.html',
+                    mphoto = photo if msg else None,
+                    message = message,
+                    form = form, 
+                    date_error_message = field + ': ' + error[0])
 
 
 # ----- HELPER FUNCTIONS ------ 
@@ -287,18 +287,14 @@ def send_message(message: Message):
     for receiver_email in receiver_emails:
         message.receiver = receiver_email
         message.receiver_id = UserManager.get_user_by_email(receiver_email).id
-        print(message.serialize())
         MessageManager.create_message(message)
 
 # build a new message if msg is None, else edit msg 
 # (build a new message with same id of msg)
 def build_message(form, msg):
     if request.form.get('feature[]'):
-        s = ''
-        receivers = request.form.getlist('feature[]')
-        for email in receivers:
-            s += email + ', '
-        form.receiver.data = s[:-2]
+        receivers = ', '.join(request.form.getlist('feature[]'))
+        form.receiver.data = receivers
     # covert date to string
     str_date = date_to_string(form.date.data, form.time.data)
     # check if there is an image attached
@@ -310,7 +306,6 @@ def build_message(form, msg):
         byte_image = b64encode(file.read())
         image_string = byte_image.decode('utf-8')
     # build the message to draft or to send
-
     message = Message()
     # fake id
     message.id = msg.id if msg else -1

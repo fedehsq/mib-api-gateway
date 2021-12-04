@@ -64,7 +64,9 @@
       margin-top: 50px
   }
   
+  .box input[type="date"],
   .box input[type="text"],
+  .box input[type="email"],
   .box input[type="password"] {
       border: 0;
       background: none;
@@ -86,6 +88,8 @@
       font-weight: 500
   }
   
+  .box input[type="date"]:focus,
+  .box input[type="email"]:focus,
   .box input[type="text"]:focus,
   .box input[type="password"]:focus {
       width: 300px;
