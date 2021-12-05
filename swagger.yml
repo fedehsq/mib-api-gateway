@@ -401,6 +401,33 @@ paths:
         200:
           description: Reloads the message.html page with a warning, in case the receiver email(s) fields were invalid. Otherwise it informs user of correct reply. 
 
+  /lottery:
+    get:
+      tags: [ Lottery ]
+      summary: Return the html page containing the form for play the lottery game
+      responses:
+        200:
+          description: Renders the lottery.html template containing the form to be filled with a number for play with a warning in case of the user has already chosen a number before the extraction 
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      tags: [ Lottery ]
+      summary: Handles the play of the lottery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lottery_number:
+                  type: integer
+                  description: the chosen number
+                  example: 12
+      responses:
+        302:
+          description: Redirects to the index.html, homepage of user. 
+
 components:
   schemas:
     MessageFields:
