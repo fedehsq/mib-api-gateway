@@ -7,7 +7,6 @@ from wtforms.validators import Length
 
 from mib.validators.age import AgeValidator
 
-
 class UserForm(FlaskForm):
     """
     Form created to allow the customers sign up to the application.

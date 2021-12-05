@@ -157,8 +157,6 @@ def user_registration(form: UserForm):
                 mphoto = DEFAULT_PIC, 
                 date_error_message = field + ': ' + error[0])
 
-
-
 def edit_profile():
     """
     Post request to edit
@@ -167,7 +165,8 @@ def edit_profile():
     # the email is not editable 
     # so manual fill this field to avoid error on submit
     form.email.data = current_user.email
-    #points = current_user.points
+    badwords = UserManager.get_badwords_by_user_id(current_user.id)
+    blacklist = UserManager.get_blacklist_by_user_id(current_user.id)
     if form.validate_on_submit():
         # update user info
         _, password, firstname, lastname, \
@@ -179,8 +178,6 @@ def edit_profile():
         )
         updated_badwords = UserManager.update_badwords(current_user.id, badwords.split(', '))
         updated_blacklist = UserManager.update_blacklist(current_user.id, blacklist.split(', '))
-
-        #if response.status_code == 200: 
         # update current user
         current_user.photo = updated_user.photo
         current_user.first_name = updated_user.first_name
@@ -192,11 +189,13 @@ def edit_profile():
             mphoto = current_user.photo,
             form = fill_form_with_user(current_user, updated_badwords, updated_blacklist), 
             just_edited = "Personal info updated. Return to ")
-    # wrong date format
+    # some error
     else:
-        return render_template("profile.html", 
-            form = fill_form_with_user(current_user), 
-            date_error_message = "Date format DD/MM/YYYY.")
+        for field, error in form.errors.items():
+            return render_template("profile.html",
+                mphoto = current_user.photo,
+                form = fill_form_with_user(current_user, badwords, blacklist), 
+                date_error_message =  field + ': ' + error[0])
 
 def show_profile():
     """
@@ -210,7 +209,6 @@ def show_profile():
         mphoto = current_user.photo, 
         form = form, 
         suggest = suggest)
-
 
 def fill_form_with_user(user, badwords, blacklist):
     """
