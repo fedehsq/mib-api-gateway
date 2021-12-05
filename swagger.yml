@@ -36,8 +36,10 @@ paths:
               properties:
                 email:
                   type: string
+                  example: example@example.com
                 password:
                   type: string
+                  example: '12345'
               required:
                 - email
                 - password
@@ -58,7 +60,7 @@ paths:
           description: Redirects to the login page if user isn't logged
     
     post:
-      summary: Updates the fields for the logged customer by using his id
+      summary: Updates the fields for the logged customer
       tags:  [ Profile ]
       requestBody:
         required: true
@@ -70,24 +72,31 @@ paths:
                 email:
                   type: string
                   description: the email field for the user
+                  example: example@example.com
                 password:
                   type: string
                   description: the password field for the user
+                  example: '12345'
                 firstname: 
                   type: string
                   description: the firstname field for the user
+                  example: Mario
                 lastname: 
                   type: string
                   description: the lastname field for the user
+                  example: Rossi
                 birthdate:
                   type: string
                   description: the birthday field for the user
+                  example: 12/12/1996
                 badwords:
                   type: string
                   description: the badwords field for the user
+                  example: devil, evil
                 blacklist:
                   type: string
                   description: the blacklist field for the user
+                  example: example1@example1.com
               required:
                 - password
                 - firstname
@@ -95,7 +104,7 @@ paths:
                 - birthday
       responses:
         200:
-          description: Renders the update_customer template, to allow the customer to modify its data
+          description: Renders the profile.html template with the updated infos
         302: 
           description: Redirects to the login page if user isn't logged
 
@@ -132,21 +141,27 @@ paths:
                 email:
                   type: string
                   description: the email field for the user
+                  example: example@example.com
                 password:
                   type: string
                   description: the password field for the user
+                  example: '1234'
                 firstname: 
                   type: string
                   description: the firstname field for the user
+                  example: Mario
                 lastname: 
                   type: string
                   description: the lastname field for the user
+                  example: Rossi
                 birthdate:
                   type: string
                   description: the birthday field for the user
+                  example: 12/12/1996
                 badwords:
                   type: string
                   description: the badwords field for the user
+                  example: devil, evil
               required:
                 - email
                 - password
@@ -210,3 +225,222 @@ paths:
           description: Renders report.html template that informs the logged user of inserting an invalid email
         302: 
           description: Report the user, and redirects to the home page if the user is logged othwerwise redirects to the login page
+
+  /message:
+    get:
+      tags: [ Message ]
+      summary: Return the html page containing the form to create a message with the logged user as sender
+      responses:
+        200:
+          description: Renders the message.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      summary: Return the html page containing the filled form of the message created
+      tags: [ Message ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFields'
+      responses:
+        200:
+          description: Reloads the message.html page with a warning, in case the message fields were invalid. Otherwise it informs user of correct creation.
+  
+  /message/{receiver_email}:
+    get:
+      tags: [ Message ]
+      summary: Return the html page containing the form to create a message with the logged user as sender and with receiver_email as destination
+      responses:
+        200:
+          description: Renders the message.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      summary: Return the html page containing the filled form of the message created
+      tags: [ Message ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFields'
+      responses:
+        200:
+          description: Reloads the message.html page with a warning, in case the message fields were invalid. Otherwise it informs user of correct creation.  
+
+  /mailbox:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the mailbox of the logged user
+      responses:
+        200:
+          description: Renders the mailbox.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+
+  /mailbox/draft:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the draft messages of the logged user
+      responses:
+        200:
+          description: Renders the messages_list_.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/draft/{message_id}:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the draft message with id = message_id of the logged user
+      responses:
+        200:
+          description: Renders the message.html template containing the message with id = message_id if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/inbox:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the inbox messages of the logged user
+      responses:
+        200:
+          description: Renders the messages_list_.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/inbox/{message_id}:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the inbox message with id = message_id of the logged user
+      responses:
+        200:
+          description: Renders the message.html template containing the message with id = message_id if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged  
+  /mailbox/sent:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the sent messages of the logged user
+      responses:
+        200:
+          description: Renders the messages_list_.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/sent/{message_id}:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the sent message with id = message_id of the logged user
+      responses:
+        200:
+          description: Renders the message.html template containing the message with id = message_id if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/scheduled:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the scheduled messages of the logged user
+      responses:
+        200:
+          description: Renders the messages_list_.html template if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/scheduled/{message_id}:
+    get:
+      tags: [ Mailbox ]
+      summary: Return the html page containing the scheduled message with id = message_id of the logged user
+      responses:
+        200:
+          description: Renders the message.html template containing the message with id = message_id if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+  /mailbox/forward/{message_id}:
+    get:
+      tags: [ Message ]
+      summary: Return the html page containing the message with id = message_id ready to be forwarded
+      responses:
+        200:
+          description: Renders the message.html template containing the message with id = message_id if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      tags: [ Message ]
+      summary: Handles the forward of the message with id = message_id of the logged user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        200:
+          description: Reloads the message.html page with a warning, in case the receiver email(s) fields were invalid. Otherwise it informs user of correct forward. 
+
+  /mailbox/reply/{message_id}:
+    get:
+      tags: [ Message ]
+      summary: Return the html page containing the form's receiver body already filled with the sender of message with id = message_id
+      responses:
+        200:
+          description: Renders the message.html template containing the message form to be filled for reply if the user is logged.
+        302: 
+          description: Redirects to the login page if user isn't logged
+    post:
+      tags: [ Message ]
+      summary: Handles the reply of the message with id = message_id of the logged user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFields'
+      responses:
+        200:
+          description: Reloads the message.html page with a warning, in case the receiver email(s) fields were invalid. Otherwise it informs user of correct reply. 
+
+components:
+  schemas:
+    MessageFields:
+      required:
+        - sender
+        - receiver
+        - body
+        - date
+        - time
+      type: "object"
+      properties:
+        sender: 
+          type: string
+          description: email of sender
+          example: example@example.com
+        receiver:
+          type: string
+          description: email of receiver
+          example: example1@example1.com
+        body:
+          type: string
+          description: The body of the message
+          example: hi, how are you?
+        photo:
+          type: string
+          description: The photo encoded as a string
+          example: base64encoded
+        date:
+          type: string
+          description: The date of the message
+          example: 12/12/2021
+        time:
+          type: string
+          description: The time of the message
+          example: 12:12
+        draft:
+          type: boolean
+          description: Flag indicating if the message is draft 
+          example: True
+        scheduled:
+          type: boolean
+          description: Flag indicating if the message is scheduled 
+          example: False

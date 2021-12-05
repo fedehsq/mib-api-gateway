@@ -2,6 +2,7 @@ from os import times
 from flask import Blueprint, redirect, render_template, request
 from flask_login import login_required, current_user
 from mib.rao.message_manager import MessageManager
+from mib.rao.user_manager import UserManager
 from datetime import datetime, time
 from mib.views.message import edit_message, fill_message_form_from_message
 
@@ -100,10 +101,11 @@ def scheduled(id):
     Show the scheduled messages or a message corresponding to a specific id
     """
     # check if user wants to delete message and check if the user has points to do this
-    #if (request.form.__contains__('delete') and current_user.points >= 150):
-    check_delete_message()
-
-        #current_user.points -= 150
+    if (request.form.__contains__('delete') and current_user.points >= 150):
+        message_id = request.form['delete']
+        MessageManager.delete_message_by_id(message_id)
+        current_user.points -= 150
+        UserManager.update_points(current_user.id, 'decrease')
     # check if the request is to see all messages...
     if (id == ''):
         scheduled = MessageManager.get_scheduled(current_user.email, current_user.id)

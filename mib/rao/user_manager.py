@@ -281,6 +281,15 @@ class UserManager:
             return abort(500)
 
     @classmethod
+    def update_points(cls, user_id: int, points):
+        """
+        This method contacts the users microservice
+        to allow the user with user_id to update his points
+        :return: points updated
+        """
+        return UserManager.update('user/updatepoints', user_id, points)
+
+    @classmethod
     def create_badwords(cls, user_id: int, badwords):
         """
         This method contacts the users microservice

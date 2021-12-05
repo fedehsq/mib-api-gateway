@@ -23,7 +23,7 @@ def already_played(id_):
     return response
         
 #route to play lottery
-@lottery.route('/Lottery', methods=['GET','POST'])
+@lottery.route('/lottery', methods=['GET','POST'])
 @login_required
 def play_lottery():
     #check if user is authenticated 
