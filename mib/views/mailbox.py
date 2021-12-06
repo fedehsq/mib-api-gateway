@@ -47,7 +47,9 @@ def draft(id):
     Renders a template with the draft messages
     """
     # check if user wants to delete message
-    check_delete_message()
+    if (request.form.__contains__('delete')):
+        message_id = request.form['delete']
+        MessageManager.delete_message_by_id(message_id)
 
     # check if the request is to see all messages...
     if (id == ''):
@@ -157,7 +159,16 @@ def check_delete_message():
     """
     if (request.form.__contains__('delete')):
         message_id = request.form['delete']
-        MessageManager.delete_message_by_id(message_id)
+        message = MessageManager.get_message_by_id(message_id)
+        # One of the two user interested in message has already deleted the message
+        # in his folder, so the message can be definitely deleted from db
+        if message.deleted != 0:
+            MessageManager.delete_message_by_id(message_id)
+            return
+        # else the flag deleted is set to 1 or 2 in order to hide the message
+        # in the folder for the user who has deleted it
+        message.deleted = 2 if current_user.id == message.sender_id else 1
+        MessageManager.update_message(message)
 
 def render_message_by_id(id):
     """
