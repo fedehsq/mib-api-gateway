@@ -19,11 +19,12 @@ class Message():
     sent = 0
     read = 0
     bold = None
+    deleted = 0
     italic = None
     underline = None
 
     SERIALIZE_LIST = ['id', 'sender_id', 'receiver_id', 'sender', 'receiver', 'body', 'photo', 'timestamp',\
-             'draft', 'scheduled', 'sent', 'read', 'bold', 'italic',\
+             'draft', 'scheduled', 'sent', 'read', 'deleted', 'bold', 'italic',\
              'underline']
 
     @staticmethod
@@ -49,6 +50,7 @@ class Message():
         self.scheduled = kw["scheduled"]
         self.sent = kw["sent"]
         self.read = kw["read"]
+        self.deleted = kw["deleted"]
         self.bold = kw["bold"]
         self.italic = kw["italic"]
         self.underline = kw["underline"]

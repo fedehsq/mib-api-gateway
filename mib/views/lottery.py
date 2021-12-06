@@ -32,6 +32,8 @@ def play_lottery():
     form = LotteryForm()
     if request.method == 'POST':
         number = form.data['number']
+        if type(number) != int:
+            return render_template('lottery.html', form = form, error_number = "Number not allowed! Please choose another number between 1 and 100", number = number)
         if number > 100 or number < 1:
             if(already_played(current_user.id)):
                 return render_template('lottery.html', form = form, error_number = "Number not allowed! Please choose another number between 1 and 100", number = number)
