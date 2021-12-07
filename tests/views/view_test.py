@@ -23,20 +23,29 @@ class ViewTest(unittest.TestCase):
         """
         user = self.generate_user()
         response = self.user_manager.create_user(
-                'customer',
+                #'customer',
                 user.get('email'),
                 user.get('password'),
                 user.get('firstname'),
                 user.get('lastname'),
                 user.get('birthdate'),
-                user.get('phone')
+                user.get('photo')
+                #user.get('phone')
                 )
+        json=response.json()
+        user_created=json["body"]
+        #print(response.json())
+        assert response.status_code == 201
 
-        rv = self.client.post(
-            self.BASE_URL+'/login',
-            json=user
-        )
-        return user
+        data={
+            'email': user_created['email'],
+            
+            'password': user.get('password'),
+        }
+        response = self.user_manager.authenticate_user(user.get('email'),user.get('password'))
+
+        assert response != None
+        return user_created
     
     def generate_user(self):
         """Generates a random user, depending on the type
@@ -48,12 +57,13 @@ class ViewTest(unittest.TestCase):
             'id': randint(0,999),
             'email': self.faker.email(),
             'password': self.faker.password(),
-            'is_active' : choice([True,False]),
-            'authenticated': False,
-            'is_anonymous': False,
+            #'is_active' : choice([True,False]),
+            #'authenticated': False,
+            #'is_anonymous': False,
             'firstname': self.faker.first_name(),
             'lastname': self.faker.last_name(),
-            'birthdate': self.faker.date(),
-            'phone': self.faker.phone_number()
+            'birthdate': self.faker.date_of_birth().strftime("%d/%m/%Y"),
+            'photo': 'test',
+            #'phone': self.faker.phone_number()
         }
         return data

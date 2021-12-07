@@ -21,21 +21,19 @@ class TestUserManager(RaoTest):
         self.app = app
 
     def generate_user(self, type):
-        extra_data = {
-            'firstname': "Mario",
-            'lastname': "Rossi",
-            'birthdate': TestUserManager.faker.date(),
-            'phone': TestUserManager.faker.phone_number()
-        }
-
+    
         data = {
             'id': randint(0, 999),
             'email': TestUserManager.faker.email(),
-            'is_active' : choice([True,False]),
-            'authenticated': choice([True,False]),
-            'is_anonymous': False,
+            #'is_active' : choice([True,False]),
+            #'authenticated': choice([True,False]),
+            #'is_anonymous': False,
             'type': type,
-            'extra': extra_data,
+            'first_name': "Mario",
+            'last_name': "Rossi",
+            'birthdate': TestUserManager.faker.date(),
+            'points': "0",
+            'photo': "jpeg"
         }
 
         user = User(**data)
@@ -44,15 +42,23 @@ class TestUserManager(RaoTest):
     @patch('mib.rao.user_manager.requests.get')
     def test_get_user_by_id(self, mock_get):
         user = self.generate_user(type='operator')
+        user_data = {
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'birthdate': user.birthdate,
+            'photo': user.photo,
+            'points': user.points
+            #'is_active': False,
+            #'authenticated': False,
+            #'is_anonymous': False,
+            #'type': user.type
+        }
         mock_get.return_value = Mock(
             status_code=200,
             json = lambda:{
-                'id':user.id,
-                'email':user.email,
-                'is_active': False,
-                'authenticated': False,
-                'is_anonymous': False,
-                'type': user.type
+                'body':user_data
             }
         )
         response = self.user_manager.get_user_by_id(id)
@@ -69,15 +75,24 @@ class TestUserManager(RaoTest):
     @patch('mib.rao.user_manager.requests.get')
     def test_get_user_by_email(self, mock_get):
         user = self.generate_user(type='customer')
+        user_data = {
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'birthdate': user.birthdate,
+            'photo': user.photo,
+            'points': user.points
+            #'is_active': False,
+            #'authenticated': False,
+            #'is_anonymous': False,
+            #'type': user.type
+        }
+
         mock_get.return_value = Mock(
             status_code=200,
             json = lambda:{
-                'id':user.id,
-                'email':user.email,
-                'is_active': False,
-                'authenticated': False,
-                'is_anonymous': False,
-                'type': user.type
+                'body': user_data
             }
         )
         response = self.user_manager.get_user_by_email(user.email)
@@ -90,32 +105,6 @@ class TestUserManager(RaoTest):
         email = TestUserManager.faker.email()
         with self.assertRaises(HTTPException) as http_error:
             self.user_manager.get_user_by_email(email)
-            self.assertEqual(http_error.exception.code, 500)
-
-    @patch('mib.rao.user_manager.requests.get')
-    def test_get_user_by_phone(self, mock_get):
-        user = self.generate_user(type='customer')
-        mock_get.return_value = Mock(
-            status_code=200,
-            json = lambda:{
-                'id':user.id,
-                'email':user.email,
-                'is_active': False,
-                'authenticated': False,
-                'is_anonymous': False,
-                'type': user.type
-            }
-        )
-        response = self.user_manager.get_user_by_phone(user.phone)
-        assert response is not None
-    
-    @patch('mib.rao.user_manager.requests.get')
-    def test_get_user_by_phone_error(self, mock):
-        mock.side_effect = requests.exceptions.Timeout()
-        mock.return_value = Mock(status_code=400, json=lambda : {'message': 0})
-        phone = TestUserManager.faker.phone_number()
-        with self.assertRaises(HTTPException) as http_error:
-            self.user_manager.get_user_by_phone(phone)
             self.assertEqual(http_error.exception.code, 500)
 
     @patch('mib.rao.user_manager.requests.delete')
@@ -142,15 +131,20 @@ class TestUserManager(RaoTest):
         user_data = {
             'id': user.id,
             'email': user.email,
-            'is_active': False,
-            'authenticated': False,
-            'is_anonymous': False,
-            'type': user.type
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'birthdate': user.birthdate,
+            'photo': user.photo,
+            'points': user.points
+            #'is_active': False,
+            #'authenticated': False,
+            #'is_anonymous': False,
+            #'type': user.type
         }
         mock_post.return_value = Mock(
             status_code=200,
             json = lambda:{
-                'user': user_data
+                'body': user_data
             }
         )
         password = TestUserManager.faker.password()
