@@ -49,6 +49,7 @@ class Config(object):
 
     # secret key
     SECRET_KEY = os.getenv('APP_SECRET_KEY', b'isreallynotsecretatall')
+    WTF_CSRF_ENABLED = False
 
 
 class DebugConfig(Config):
@@ -57,6 +58,8 @@ class DebugConfig(Config):
     """
     DEBUG = True
     TESTING = False
+    WTF_CSRF_ENABLED = False
+
 
 
 class DevConfig(DebugConfig):

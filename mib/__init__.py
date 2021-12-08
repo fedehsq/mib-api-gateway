@@ -9,7 +9,7 @@ from base64 import b64encode
 __version__ = '0.1'
 
 login = None
-debug_toolbar = None
+#debug_toolbar = None
 app = None
 
 
@@ -23,7 +23,7 @@ def create_app():
 
     app = Flask(__name__, instance_relative_config=True)
 
-    flask_env = os.getenv('FLASK_ENV', 'development')
+    flask_env = os.getenv('FLASK_ENV', 'None')
     if flask_env == 'development':
         config_object = 'config.DevConfig'
     elif flask_env == 'testing':
@@ -58,14 +58,14 @@ def register_extensions(app):
     :param app: Flask Application Object
     :return: None
     """
-    global debug_toolbar
+    """ global debug_toolbar
 
     if app.debug:
         try:
             from flask_debugtoolbar import DebugToolbarExtension
             debug_toolbar = DebugToolbarExtension(app)
         except ImportError:
-            pass
+            pass"""
 
     # adding bootstrap
     Bootstrap(app)

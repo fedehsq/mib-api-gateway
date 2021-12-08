@@ -37,7 +37,6 @@ def login():
             # deleted or wrong credentials
             return render_template('login.html', form = form, 
                 wrong_credentials = "Incorrect username or password.")
-
     return render_template('login.html', form = form)
 
 @auth.route('/logout')
@@ -48,6 +47,7 @@ def logout():
     Returns:
         Redirects the view to the login page
     """
+    print('slogggato')
     logout_user()
     return redirect('/login')
 

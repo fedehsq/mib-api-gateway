@@ -27,8 +27,6 @@ def already_played(id_):
 @login_required
 def play_lottery():
     #check if user is authenticated 
-    #if not current_user.is_authenticated:
-    #    return redirect("/")
     form = LotteryForm()
     if request.method == 'POST':
         number = form.data['number']

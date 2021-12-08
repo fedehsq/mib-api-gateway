@@ -174,8 +174,8 @@ def check_words(message, rec):
     receiver = UserManager.get_user_by_email(rec)
     message.receiver_id = receiver.id
     badwords = UserManager.get_badwords_by_user_id(receiver.id)
-    if badwords == []:
-        return False
+    """if badwords == []:
+        return False"""
     # deletes comma, dot, etc..
     cleaned_body = re.split('\W', message.body)
     for word in badwords:
@@ -202,7 +202,7 @@ def check_dests(recipients_list):
                 unregistered = unregistered + ", " + user
     return unregistered
 
-# Check if all the recepients are not deleted
+"""# Check if all the recepients are not deleted
 def check_deleted(recipients_list):
     deleted = ""
     deleted_users = []
@@ -217,7 +217,7 @@ def check_deleted(recipients_list):
                 deleted = deleted + item
             else:
                 deleted = deleted + ", " + item
-    return deleted
+    return deleted"""
 
 # Check if the sender is in one of the recipient's blacklist
 def check_blacklist(recipients_list):
@@ -336,12 +336,12 @@ def fill_message_form_from_message(message):
     form.choice.data = 'Schedule'
     return form
 
-def date_explosion(message):  
+"""def date_explosion(message):  
     date = datetime.strptime(message.timestamp, '%Y-%m-%dT%H:%M:%SZ')
     date = date.strftime('%d/%m/%Y %H:%M')
     day = datetime.strptime(date.split(" ")[0], "%d/%m/%Y")
     time = datetime.strptime(date.split(" ")[1], '%H:%M')
-    return day, time
+    return day, time"""
 
 
 # covert the date into a string
