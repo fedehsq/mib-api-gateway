@@ -114,7 +114,6 @@ def get_form_fields(form):
         form.data['blacklist']
     )
 
-
 def user_registration(form: UserForm):
     """
     Register a user if all fields are properly filled
@@ -122,7 +121,6 @@ def user_registration(form: UserForm):
     if form.validate_on_submit():
         email, password, firstname, lastname, \
         birthdate, photo, badwords, _ = get_form_fields(form)
-       
         birthdate =  birthdate.strftime('%d/%m/%Y')
         response = UserManager.create_user(
             email, password, firstname,

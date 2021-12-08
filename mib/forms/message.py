@@ -15,7 +15,7 @@ class MessageForm(FlaskForm):
         validators=[DataRequired(), DateRange(min = date.today())])
     time  = f.TimeField('Time', format='%H:%M',
         default = time(datetime.now().hour, datetime.now().minute),
-        validators=[DataRequired(), TimeRange(min = time(datetime.now().hour, datetime.now().minute))])
+        validators=[DataRequired()])
     choice = f.RadioField('Label', choices = [('Draft', 'Draft'),('Schedule', 'Schedule')], default='Schedule')
     display = ['receiver', 'body', 'photo', 'date', 'time' 'choice']
 

@@ -5,6 +5,7 @@ from random import randint, choice
 from werkzeug.exceptions import HTTPException
 import requests
 
+
 from mib.auth.user import User
 from .rao_test import RaoTest
 
@@ -16,7 +17,11 @@ class TestUserManager(RaoTest):
     def setUp(self):
         super(TestUserManager, self).setUp()
         from mib.rao.user_manager import UserManager
+        from mib.rao.lottery_manager import LotteryManager
+
         self.user_manager = UserManager
+        self.lottery_manager = LotteryManager
+
         from mib import app
         self.app = app
 
@@ -28,10 +33,10 @@ class TestUserManager(RaoTest):
             #'is_active' : choice([True,False]),
             #'authenticated': choice([True,False]),
             #'is_anonymous': False,
-            'type': type,
             'first_name': "Mario",
             'last_name': "Rossi",
-            'birthdate': TestUserManager.faker.date(),
+            'birthdate': TestUserManager.faker.date_of_birth().strftime("%d/%m/%Y"),
+            'type': type,
             'points': "0",
             'photo': "jpeg"
         }
@@ -39,6 +44,29 @@ class TestUserManager(RaoTest):
         user = User(**data)
         return user
 
+    def test_create_user(self):
+        user = self.generate_user('operator')
+        password = self.faker.password()
+        response = self.user_manager.create_user(user.email, password, user.first_name,user.last_name,user.birthdate, user.photo)
+        assert response != None
+
+    def test_update_user(self):
+        user = self.generate_user('operator')
+        password = self.faker.password()
+        response = self.user_manager.create_user(user.email, password, user.first_name,user.last_name,user.birthdate, user.photo)
+        assert response != None
+        response = self.user_manager.update_user(user.email, user.id, password, "pippo", user.last_name,user.birthdate, user.photo)
+        assert response != None
+    
+    def test_report_user(self):
+        user = self.generate_user('operator')
+        password = self.faker.password()
+        response = self.user_manager.create_user(user.email, password, user.first_name,user.last_name,user.birthdate, user.photo)
+        response = self.user_manager.report(user.email)
+        assert response == 200
+        response = self.user_manager.report("user.mail")
+        assert response == 404
+        
     @patch('mib.rao.user_manager.requests.get')
     def test_get_user_by_id(self, mock_get):
         user = self.generate_user(type='operator')
@@ -136,10 +164,6 @@ class TestUserManager(RaoTest):
             'birthdate': user.birthdate,
             'photo': user.photo,
             'points': user.points
-            #'is_active': False,
-            #'authenticated': False,
-            #'is_anonymous': False,
-            #'type': user.type
         }
         mock_post.return_value = Mock(
             status_code=200,
@@ -164,3 +188,34 @@ class TestUserManager(RaoTest):
                     self.faker.password()
                 )
                 self.assertEqual(http_error.exception.code, 500)
+    
+    def test_create_badwords(self):
+        user = self.generate_user('operator')
+        password = self.faker.password()
+        response = self.user_manager.create_user(user.email, password, user.first_name,user.last_name,user.birthdate, user.photo)
+        json = response.json()
+        u = json['body']
+        r = self.user_manager.create_badwords(u['id'], ["Badword1"])
+        assert r == ["Badword1"]
+        r = self.user_manager.update_badwords(u['id'], ["Badword2"])    
+        assert r == ["Badword2"]
+        r = self.user_manager.delete_badwords(u['id'])
+        assert r.status_code == 202
+
+
+    def test_create_blacklist(self):
+        user = self.generate_user('operator')
+        password = self.faker.password()
+        response = self.user_manager.create_user(user.email, password, user.first_name,user.last_name,user.birthdate, user.photo)
+        json = response.json()
+        u = json['body']
+        r = self.user_manager.create_blacklist(u['id'], ["a@b.commm"])
+        assert r == []
+
+        r = self.user_manager.update_blacklist(u['id'], ["a@b.comm"])
+        assert r == []
+
+        r = self.user_manager.delete_blacklist(u['id'])
+        assert r.status_code == 202
+
+    

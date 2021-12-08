@@ -70,9 +70,12 @@ def edit_message(receiver, msg = None):
             form = form, suggest = suggest)
     else:
         # build the message
+        print('sono qua')
         message = build_message(form, msg)
+        print(message.serialize())
         photo = 'data:image/jpeg;base64,' + message.photo if message.photo != '' else None
         if form.validate_on_submit():
+            print('messaggio valudo')
             # checking if it is new (scheduled) or edited (draft)
             if form.choice.data == 'Schedule':
                 # render a template with correct values
@@ -130,6 +133,8 @@ def edit_message(receiver, msg = None):
         # invalid fields
         else:
             for field, error in form.errors.items():
+                print(field)
+                print(error)
                 return render_template('message.html',
                     mphoto = photo if msg else None,
                     message = message,
@@ -202,7 +207,7 @@ def check_dests(recipients_list):
                 unregistered = unregistered + ", " + user
     return unregistered
 
-# Check if all the recepients are not deleted
+"""# Check if all the recepients are not deleted
 def check_deleted(recipients_list):
     deleted = ""
     deleted_users = []
@@ -217,7 +222,7 @@ def check_deleted(recipients_list):
                 deleted = deleted + item
             else:
                 deleted = deleted + ", " + item
-    return deleted
+    return deleted"""
 
 # Check if the sender is in one of the recipient's blacklist
 def check_blacklist(recipients_list):

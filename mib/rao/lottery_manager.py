@@ -32,8 +32,6 @@ class LotteryManager:
             else:
                 form = LotteryForm()
                 return render_template('lottery.html', form = form, error_number='Default error.')
-
-
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             print(e)
             return abort(500)
