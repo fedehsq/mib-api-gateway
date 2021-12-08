@@ -1,9 +1,11 @@
 from unittest.mock import Mock, patch
-from flask import current_app
+from flask import current_app, abort
 from faker import Faker
 from random import randint, choice
 from werkzeug.exceptions import HTTPException
 import requests
+import pytest
+
 
 
 from mib.auth.user import User
@@ -224,3 +226,54 @@ class TestUserManager(RaoTest):
     def test_get_filter(self):
         response = self.message_manager.get_filtered_messages(self.faker.pyint(0,99), self.faker.email(), "This is the body", self.faker.email(), "")
         assert response == ([], [], [])
+
+    def test_get_message_id(self):
+        response = self.message_manager.get_message_by_id(121345678)
+        assert response == None
+
+    """ def test_update_points(self):
+        user = self.generate_user('operator')
+        response = self.user_manager.create_user(user.email, 'password', user.first_name,user.last_name,user.birthdate, user.photo)
+        response = self.user_manager.update_points(user.id, 100)
+        assert response['points'] == 100"""
+    """
+    def test_exception_filtered_messages(self):
+        with pytest.raises(Exception) as exc:
+            self.message_manager.get_filtered_messages(self.faker.pyint(0,99), self.faker.email(), "This is the body", self.faker.email(), 9208378920394876387904958657493023)
+    """
+    def test_exception_create_message(self):
+        with pytest.raises(Exception) as exc:
+            self.message_manager.create_message(23409487839289)
+
+    def test_exception_update_message(self):
+        with pytest.raises(Exception) as exc:
+            response = self.message_manager.update_message(23409487839289)
+
+    def test_exception_get_dir(self):
+        with pytest.raises(Exception) as exc:
+            response = self.message_manager.get_dir('2323', '2345', '3456t')
+    """
+    def test_exception_get_notification_number(self):
+        with pytest.raises(Exception) as exc:
+            response = self.message_manager.get_notifications_number('2323', '2345')
+    """
+    def test_exception_create(self):
+        with pytest.raises(Exception) as exc:
+            response = self.user_manager.create('2323', 'eicfiubef', 29273)
+    
+    def test_exception_update(self):
+        with pytest.raises(Exception) as exc:
+            response = self.user_manager.update('2323', 'eicfiubef', 29273)
+    
+    def test_exception_get_badwords_by_user_id(self):
+        with pytest.raises(Exception) as exc:
+            response = self.user_manager.get_badwords_by_user_id('owdnewoijjfneowi')
+  
+    def test_exception_get_blacklist_by_user_id(self):
+            with pytest.raises(Exception) as exc:
+                response = self.user_manager.get_blacklist_by_user_id('owdnewoijjfneowi')
+    
+    def test_exception_get_user_by_email(self):
+        with pytest.raises(Exception) as exc:
+            response = self.user_manager.get_user_by_email(233300303)
+    

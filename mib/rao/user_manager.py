@@ -79,8 +79,8 @@ class UserManager:
         This method contacts the user microservice and 
         retrieves all the registered users that correspond 
         to the searched input
-        """
-        try: 
+        """ 
+        try:
             response = requests.post("%s/search_users/%s" % (cls.USERS_ENDPOINT, searched_input), 
                 timeout = cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
@@ -98,18 +98,17 @@ class UserManager:
         This method contacts the user microservice to
         report a user
         """
-        try:
-            response = requests.post("%s/report/%s" % (cls.USERS_ENDPOINT, email), 
-                timeout = cls.REQUESTS_TIMEOUT_SECONDS)
-            #json_payload = response.json()
-            if response.status_code == 200:
-                return 200
-            elif response.status_code == 404:
-                return 404
-            else:
-                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+    
+        response = requests.post("%s/report/%s" % (cls.USERS_ENDPOINT, email), 
+            timeout = cls.REQUESTS_TIMEOUT_SECONDS)
+        #json_payload = response.json()
+        if response.status_code == 200:
+            return 200
+        elif response.status_code == 404:
+            return 404
+        else:
+            raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+
 
 
     @classmethod
@@ -118,16 +117,15 @@ class UserManager:
         This method contacts the user microservice and 
         retrieves all the registered users
         """
-        try:
-            response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            json_payload = response.json()
-            if response.status_code == 200:
-                # Get the dict of users and retrieve each user from json
-                users = [User.build_from_json(item) for item in json_payload.get('body')]  
-            else:
-                raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
+
+        response = requests.get("%s/users" % (cls.USERS_ENDPOINT), timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        json_payload = response.json()
+        if response.status_code == 200:
+            # Get the dict of users and retrieve each user from json
+            users = [User.build_from_json(item) for item in json_payload.get('body')]  
+        else:
+            raise RuntimeError('Server has sent an unrecognized status code %s' % response.status_code)
+    
         return users
                 
     @classmethod

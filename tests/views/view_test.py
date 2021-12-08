@@ -325,11 +325,22 @@ class ViewTest(unittest.TestCase):
         message.timestamp = '03/03/2020 12:30'
         message.body = 'ciao'
         m = self.message_manager.create_message(message)
-        """
+        
          # ------ Test1: logged -----
-        title = get_page_id(app, '/mailbox/draft' + str(m.id), 'page_title')
+        title = get_page_id(app, '/mailbox/draft/' + str(m.id), 'page_title')
         self.assertEqual(title, 'Message')
-        """
+
+        from mib.views.message import draft_remove
+        response = draft_remove(m)
+        assert response == None
+        response = draft_remove(None)
+
+        # ------ Test5: inbox with existing id and delete-----
+        response = post_and_get_result_id(app,'/mailbox/draft/',{"delete":m.id},"page_title")
+        self.assertEqual(response, DRAFT)
+
+       
+        
         
         # ------ Test1: logged -----
         title = get_page_id(app, '/mailbox/draft', 'page_title')
@@ -385,10 +396,14 @@ class ViewTest(unittest.TestCase):
         app = self.client
         #title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         user = generate_user()
-        response = post_register(app, user.email, user.first_name, 
-            user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
+        response = self.user_manager.create_user(user.email, 'password', user.first_name, user.last_name, user.birthdate, user.photo)
+        #response = post_register(app, user.email, user.first_name, user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
+        
         username = post_login(self.client, user.email, 'password', 'username')
         self.assertEqual(username, user.first_name)
+
+        self.user_manager.update_points(response.json()['body']['id'], 'increase')
+        self.user_manager.update_points(response.json()['body']['id'], 'increase')
 
         message = Message()
         message.id = -1
@@ -410,6 +425,10 @@ class ViewTest(unittest.TestCase):
         title = get_page_id(app, '/mailbox/scheduled', 'page_title')
         self.assertEqual(title, SCHEDULED)
 
+         # ------ Test5: inbox with existing id and delete-----
+        response = post_and_get_result_id(app,'/mailbox/scheduled/',{"delete":m.id},"page_title")
+        self.assertEqual(response, SCHEDULED)
+
         # ------ GET: LOGOUT -----
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         self.assertEqual(title, LOGIN_PAGE_TITLE)
@@ -430,6 +449,15 @@ class ViewTest(unittest.TestCase):
         # ------ Test1: logged -----
         title = get_page_id(app, '/mailbox', 'page_title')
         self.assertEqual(title, MAILBOX)
+
+
+         #Create urls to test the searching of the message 
+        BASE_URL = "http://localhost:5000/mailbox"
+        TEST1 = BASE_URL + "?msg=prova&date=&user="
+
+        resp=get_page_id(app,TEST1,"page_title")
+        self.assertEqual(resp,"Search")
+
 
         # ------ GET: LOGOUT -----
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
@@ -481,6 +509,7 @@ class ViewTest(unittest.TestCase):
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         self.assertEqual(title, LOGIN_PAGE_TITLE)
 
+
     def get_profile(self):
         app = self.client
         user = generate_user()
@@ -505,10 +534,19 @@ class ViewTest(unittest.TestCase):
         title = get_page_id(app, '/lottery', 'page_title')
         self.assertEqual(title, LOTTERY_PAGE_TITLE)
 
+        error_number = post_lottery(app, 120, "error_number")
+        self.assertEqual(error_number, LOTTERY_ERROR_NUMBER)
         # ------ 3 POST LOTTERY NUMBER SUCCEDED ------
         post_lottery(app, 22, "username")
-        self.assertEqual(username, username)
+        #self.assertEqual(username, username)
 
+        title = get_page_id(app, '/lottery', 'page_title')
+        self.assertEqual(title, LOTTERY_PAGE_TITLE)
+
+        error_number = post_lottery(app, "a", "error_number")
+        self.assertEqual(error_number, LOTTERY_ERROR_NUMBER)
+        #post_lottery(app, "a", "username")
+        #self.assertEqual(username, username)
         # ------ 4 POST WITH INCORRECT NUMBER ------
         error_number = post_lottery(app, 120, "error_number")
         self.assertEqual(error_number, LOTTERY_ERROR_NUMBER)
@@ -608,60 +646,151 @@ class ViewTest(unittest.TestCase):
         self.assertEqual(response, "You searched: admin")        
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         self.assertEqual(title, LOGIN_PAGE_TITLE)
-
-   
-        """
-        def test_forward(self):
+        
+    def test_forward(self):
         app = self.client
         user = generate_user()
-        response = post_register(app, user.email, user.first_name, 
+        response = self.user_manager.create_user(user.email, 'password', user.first_name, user.last_name, user.birthdate, user.photo)
+        """response = post_register(app, user.email, user.first_name, 
             user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
-        self.assertEqual(response, REGISTRATION_DONE)
+        self.assertEqual(response, REGISTRATION_DONE)"""
         post_login(self.client, user.email, 'password', 'username')
         
         message = Message()
         message.id = -1
         message.photo = ''
         message.receiver = user.email
-        message.receiver_id = user.id
-        message.sender_id = user.id
+        message.receiver_id = response.json()["body"]["id"]
+        message.sender_id = response.json()["body"]["id"]
         message.sender = user.email
-        message.scheduled = True
+        message.scheduled = False
+        message.read = 1
         message.draft = False
+        message.sent=1
         message.bold = message.italic = message.underline = False
         message.timestamp = '03/03/2020 12:30'
         message.body = 'ciao'
         m = self.message_manager.create_message(message)
         # ------ Test1: forward an existing message-----
-        url="/mailbox/forward/"+str(m.id)+"/"
+        url="/mailbox/forward/"+str(m.id)
         response=get_page_id(app,url,"page_title")
+           # Request the page
+        # extract the html page from the response
         self.assertEqual(response, "Message")
 
         # ------ Test2: forward with wrong id-----
-        url="/mailbox/forward/"+"-1"
+        url="/mailbox/forward/" + "-1"
         response=get_page_id(app,url,"page_title")
         self.assertEqual(response, MAILBOX)
         # ------ removing the created message-----
-        response=post_and_get_result_id(app,'/mailbox/inbox/',{"delete":id},"page_title")
+        response=post_and_get_result_id(app,'/mailbox/inbox/',{"delete":m.id},"page_title")
         self.assertEqual(response, INBOX)
 
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         self.assertEqual(title, LOGIN_PAGE_TITLE)
         
-    
-        """ 
-        """""
-        def test_reply(self):
+    """def test_draft_rm(self):
         app = self.client
         user = generate_user()
-        response = post_register(app, user.email, user.first_name, 
-            user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
-        self.assertEqual(response, REGISTRATION_DONE)
+        response = self.user_manager.create_user(user.email, 'password', user.first_name, user.last_name, user.birthdate, user.photo)
+        
         post_login(self.client, user.email, 'password', 'username')
+        
+        message = Message()
+        message.id = -1
+        message.photo = ''
+        message.receiver = user.email
+        message.receiver_id = response.json()["body"]["id"]
+        message.sender_id = response.json()["body"]["id"]
+        message.sender = user.email
+        message.scheduled = False
+        message.read = 0
+        message.draft = True
+        message.sent = 0
+        message.bold = message.italic = message.underline = False
+        message.timestamp = '03/03/2020 12:30'
+        message.body = 'ciao'
+        m = self.message_manager.create_message(message)
 
+        from mib.views.message import draft_remove
+       """
+
+        
+
+    def test_reply(self):
+        app = self.client
+        user = generate_user()
+        response = self.user_manager.create_user(user.email, 'password', user.first_name, user.last_name, user.birthdate, user.photo)
+        """response = post_register(app, user.email, user.first_name, 
+            user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
+        self.assertEqual(response, REGISTRATION_DONE)"""
+        post_login(self.client, user.email, 'password', 'username')
+        
+        message = Message()
+        message.id = -1
+        message.photo = ''
+        message.receiver = user.email
+        message.receiver_id = response.json()["body"]["id"]
+        message.sender_id = response.json()["body"]["id"]
+        message.sender = user.email
+        message.scheduled = False
+        message.read = 1
+        message.draft = False
+        message.sent=1
+        message.bold = message.italic = message.underline = False
+        message.timestamp = '03/03/2020 12:30'
+        message.body = 'ciao'
+        m = self.message_manager.create_message(message)
+        # ------ Test1: forward an existing message-----
+        url="/mailbox/reply/"+str(m.id)
+        response=get_page_id(app,url,"page_title")
+           # Request the page
+        # extract the html page from the response
+        self.assertEqual(response, "Message")
+
+        # ------ Test2: forward with wrong id-----
+        url="/mailbox/reply/" + "-1"
+        response=get_page_id(app,url,"page_title")
+        self.assertEqual(response, MAILBOX)
+        # ------ removing the created message-----
+        response=post_and_get_result_id(app,'/mailbox/inbox/',{"delete":m.id},"page_title")
+        self.assertEqual(response, INBOX)
 
         title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
         self.assertEqual(title, LOGIN_PAGE_TITLE)
-        """
         
+        
+    def test_validate_message(self):
+        app = self.client
+        user = generate_user()
+        response = self.user_manager.create_user(user.email, 'password', user.first_name, user.last_name, user.birthdate, user.photo)
+        r=self.user_manager.update_badwords(response.json()["body"]["id"],["evil","devil"])
 
+        """response = post_register(app, user.email, user.first_name, 
+            user.last_name, 'password', user.birthdate, user.photo, 'registration_done')
+        self.assertEqual(response, REGISTRATION_DONE)"""
+        post_login(self.client, user.email, 'password', 'username')
+        message = Message()
+        message.id = -1
+        message.photo = ''
+        message.receiver = user.email+", "+user.email+", "+"xd@xd.com"
+        message.receiver_id = response.json()["body"]["id"]
+        message.sender_id = response.json()["body"]["id"]
+        message.sender = user.email
+        message.scheduled = False
+        message.read = 1
+        message.draft = False
+        message.sent=1
+        message.bold = message.italic = message.underline = False
+        message.timestamp = '03/03/2020 12:30'
+        message.body = 'ciao evil'
+        from mib.views.message import validate_message
+        validate_message(message)
+        title = get_page_id(app, self.BASE_URL + '/logout', 'page_title')
+        self.assertEqual(title, LOGIN_PAGE_TITLE)
+
+    def test_server_error(self):
+        app = self.client
+
+        response = app.get('/server_error', follow_redirects = True)
+        assert response.status_code == 500

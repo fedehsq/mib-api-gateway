@@ -4,6 +4,7 @@ from faker import Faker
 from random import randint, choice
 from werkzeug.exceptions import HTTPException
 import requests
+import pytest
 from .rao_test import RaoTest
 
 

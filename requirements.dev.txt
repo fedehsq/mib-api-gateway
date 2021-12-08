@@ -7,3 +7,6 @@ pytest-cov==2.10.1
 faker==4.17.1
 blinker==1.4
 mockredispy==2.9.3
+bs4==0.0.1
+beautifulsoup4==4.10.0
+soupsieve==2.3.1

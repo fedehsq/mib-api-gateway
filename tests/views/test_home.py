@@ -10,15 +10,11 @@ class TestHome(ViewTest):
     @classmethod
     def setUpClass(cls):
         super(TestHome, cls).setUpClass()
-
+    
     def test_user(self):
         user = self.create_test_user()
         self.login_test_user(user)
                    
-
-        """rv = self.client.get(self.BASE_URL+'/')
-        print(rv.json)
-        assert rv.status_code == 200"""
 
         #rv = self.client.get(self.BASE_URL+'/logout')
     
@@ -58,5 +54,9 @@ class TestHome(ViewTest):
     def test_users_view(self):
         self.test_users()
 
-    """def test_forward_message(self):
-        self.test_forward()"""
+    def test_forward_message(self):
+        self.test_forward()
+    
+    def test_reply_message(self):
+        self.test_reply()
+

@@ -49,8 +49,8 @@ class User(UserMixin):
         else:
             raise AttributeError('Attribute %s does not exist' % item)
 
-    def __str__(self):
+    """def __str__(self):
         s = 'User Object\n'
         for (key, value) in self.__dict__.items():
             s += "%s=%s\n" % (key, value)
-        return s
+        return s"""

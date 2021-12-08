@@ -52,7 +52,6 @@ class LotteryManager:
                 return False
             else:
                 return 2 
-
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             print(e)
             return abort(500)
