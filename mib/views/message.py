@@ -273,10 +273,11 @@ def update_draft_message(message):
 def draft_remove(message: Message):
     if not message:
         return
-    # get the draft messages of current user
-    message.draft = False
+    # message sent
+    MessageManager.delete_message_by_id(message.id)
+    """message.draft = False
     message.scheduled = True
-    MessageManager.update_message(message)
+    MessageManager.update_message(message)"""
 
 def send_message(message: Message):
     """
