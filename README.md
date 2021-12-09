@@ -1,22 +1,22 @@
 # Message In a Bottle - API Gateway
 
+[![Build Status](https://app.travis-ci.com/fedehsq/micro_mib.svg?token=sCUbEzotwbjEpdHdvWDb&branch=master)](https://app.travis-ci.com/fedehsq/micro_mib), coverage 90%
+
 This is the source code of Message in a Bottle application, self project of *Advanced Software Engineering* course,
 University of Pisa.
 
-## Team info
-
-- The *squad id* is **<SQUAD_ID>**
-- The *team leader* is <team_leader>
+- The *squad id* is **9**
+- The *team leader* is Francesco Kotopulos De Angelis
 
 #### Members
 
-| Name and Surname | Email |
-| ---------------- | ----- |
-|                  |       |
-|                  |       |
-|                  |       |
-|                  |       |
-|                  |       |
+|         Name and Surname         |              Email                  |
+| ------------------------------   | ----------------------------------- |
+| Federico Bernacca                | f.bernacca@studenti.unipi.it        |
+| Paola Petri                      | p.petri1@studenti.unipi.it          |
+| Nicolò Pierami                   | n.pierami@studenti.unipi.it         |
+| Francesco Kotopulos De Angelis   | f.kotopulosdeange@studenti.unipi.it |
+| Manfredo Facchini                | m.facchini1@studenti.unipi.it       |
 
 
 ## Instructions
@@ -96,7 +96,21 @@ for example gunicorn and psycopg2.
 **IMPORTANT:** the Docker image uses the only the production requirements.
 ### Run tests
 
-To run all the tests, execute the following command:
+To run all the tests, once downloaded, execute the following command:
+
+run all microservices in their folder:
+
+`virtualenv -p python3 venv`
+
+`source venv/bin/activate`
+
+`pip install -r requirements.dev.txt`
+
+`export FLASK_ENV=development`
+
+`bash run.sh`
+
+then in this folder:
 
 `python -m pytest`
 
